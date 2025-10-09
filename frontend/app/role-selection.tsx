@@ -63,6 +63,15 @@ export default function RoleSelection() {
           <Ionicons name="person-outline" size={48} color={Colors.white} />
           <Text style={styles.roleText}>Camarero 2</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.roleButton, { backgroundColor: Colors.primary }]}
+          onPress={() => selectRole('administrador')}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="settings" size={48} color={Colors.white} />
+          <Text style={styles.roleText}>Administrador</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
