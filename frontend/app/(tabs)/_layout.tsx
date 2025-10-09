@@ -1,8 +1,12 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/Colors';
+import { useApp } from '../../context/AppContext';
 
 export default function TabLayout() {
+  const { role } = useApp();
+  const isAdmin = role === 'administrador';
+
   return (
     <Tabs
       screenOptions={{
@@ -37,9 +41,10 @@ export default function TabLayout() {
         name="new-order"
         options={{
           title: 'Nuevo Pedido',
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color, size}) => (
             <Ionicons name="add-circle" size={size} color={color} />
           ),
+          href: isAdmin ? null : undefined,
         }}
       />
       <Tabs.Screen
@@ -49,6 +54,27 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="grid" size={size} color={color} />
           ),
+          href: isAdmin ? undefined : null,
+        }}
+      />
+      <Tabs.Screen
+        name="categories"
+        options={{
+          title: 'Categorías',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="apps" size={size} color={color} />
+          ),
+          href: isAdmin ? undefined : null,
+        }}
+      />
+      <Tabs.Screen
+        name="daily-closure"
+        options={{
+          title: 'Cierre Diario',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="cash" size={size} color={color} />
+          ),
+          href: isAdmin ? undefined : null,
         }}
       />
       <Tabs.Screen
