@@ -1,15 +1,33 @@
-import { Text, View, StyleSheet, Image } from "react-native";
+import React, { useEffect } from 'react';
+import { View, Image, StyleSheet, Dimensions } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Colors } from '../constants/Colors';
+import { useApp } from '../context/AppContext';
 
-const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
+const { width } = Dimensions.get('window');
 
-export default function Index() {
-  console.log(EXPO_PUBLIC_BACKEND_URL, "EXPO_PUBLIC_BACKEND_URL");
+export default function SplashScreen() {
+  const router = useRouter();
+  const { role } = useApp();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (role) {
+        router.replace('/(tabs)');
+      } else {
+        router.replace('/role-selection');
+      }
+    }, 2500);
+
+    return () => clearTimeout(timer);
+  }, [role]);
 
   return (
     <View style={styles.container}>
       <Image
-        source={require("../assets/images/app-image.png")}
-        style={styles.image}
+        source={require('../assets/images/logo.png')}
+        style={styles.logo}
+        resizeMode="contain"
       />
     </View>
   );
@@ -18,13 +36,15 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0c0c0c",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 40,
   },
-  image: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "contain",
+  logo: {
+    width: width * 0.7,
+    height: width * 0.7,
+    maxWidth: 400,
+    maxHeight: 400,
   },
 });
