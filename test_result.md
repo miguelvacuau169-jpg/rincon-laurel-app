@@ -107,51 +107,63 @@ user_problem_statement: "Aplicación móvil interna para restaurante El Rincón 
 backend:
   - task: "API REST - Productos (CRUD)"
     implemented: true
-    working: "NA"
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Implementado endpoints GET, POST, PUT, DELETE para productos. Endpoints: /api/products, /api/products/:id"
+        - working: true
+          agent: "testing"
+          comment: "✅ PASSED - Todos los endpoints CRUD funcionando correctamente. GET /products retorna 14 productos existentes, POST crea productos con serialización correcta de datetime, PUT actualiza productos, DELETE elimina productos. ObjectId se convierte correctamente a string."
           
   - task: "API REST - Pedidos (CRUD)"
     implemented: true
-    working: "NA"
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Implementado endpoints GET, POST, PUT, DELETE para pedidos. Endpoints: /api/orders, /api/orders/:id. Incluye lógica de unificación de pedidos < 3 minutos"
+        - working: true
+          agent: "testing"
+          comment: "✅ PASSED - Todos los endpoints CRUD funcionando correctamente. GET /orders retorna pedidos existentes, POST crea pedidos con cálculo correcto de totales, GET /:id obtiene pedido específico, PUT actualiza estado, DELETE elimina pedidos. Serialización de datetime correcta (created_at, updated_at)."
           
   - task: "API REST - Configuración OneSignal"
     implemented: true
-    working: "NA"
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Implementado endpoints GET y PUT para /api/settings. Guarda App ID y API Key de OneSignal en MongoDB"
+        - working: true
+          agent: "testing"
+          comment: "✅ PASSED - Endpoints de configuración funcionando correctamente. GET /settings retorna estructura correcta con onesignal_app_id, onesignal_api_key y updated_at. PUT /settings actualiza configuración correctamente con serialización de datetime."
           
   - task: "API REST - Seed Data"
     implemented: true
-    working: "NA"
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Endpoint POST /api/seed para cargar 14 productos de ejemplo (comidas, bebidas, postres españoles típicos)"
+        - working: true
+          agent: "testing"
+          comment: "✅ PASSED - Endpoint POST /seed funcionando correctamente. Prevención de duplicados activa - retorna 'Data already seeded' cuando ya existen productos. Los 14 productos de ejemplo ya están cargados en la base de datos."
           
   - task: "WebSocket - Tiempo Real"
     implemented: true
@@ -159,35 +171,44 @@ backend:
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Socket.IO configurado con eventos: connect, disconnect, set_role, sync_request, order_created/updated/deleted, product_created/updated/deleted, notification"
+        - working: "NA"
+          agent: "testing"
+          comment: "⚠️ SKIPPED - WebSocket testing no realizado según instrucciones. Solo se probaron endpoints REST. Socket.IO configurado pero requiere testing específico de eventos en tiempo real."
           
   - task: "Lógica de Unificación de Pedidos"
     implemented: true
-    working: "NA"
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Función find_similar_orders() detecta pedidos creados en < 3 minutos con productos iguales y los marca como unified_with"
+        - working: true
+          agent: "testing"
+          comment: "✅ PASSED - Lógica de unificación funcionando correctamente. Creados 2 pedidos con productos similares en < 3 minutos, el segundo pedido tiene campo unified_with poblado con ID del primer pedido. Algoritmo detecta correctamente productos overlapping."
           
   - task: "Notificaciones (OneSignal placeholder)"
     implemented: true
-    working: "NA"
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "low"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Función send_notification() emite evento de Socket.IO cuando pedido pasa a 'listo'. Integración OneSignal API REST pendiente de credenciales del usuario"
+        - working: true
+          agent: "testing"
+          comment: "✅ PASSED - Sistema de notificaciones placeholder funcionando. Función send_notification() implementada correctamente, emite eventos Socket.IO. Integración OneSignal API pendiente de credenciales reales del usuario (comportamiento esperado)."
 
 frontend:
   - task: "Navegación y Routing (Expo Router)"
