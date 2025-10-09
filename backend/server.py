@@ -449,6 +449,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Mount Socket.IO
+socket_app = socketio.ASGIApp(sio, other_asgi_app=app)
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
