@@ -179,7 +179,7 @@ export default function OrdersScreen() {
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>Mesa {selectedOrder.table_number}</Text>
                 <Text style={styles.modalTime}>
-                  {format(new Date(selectedOrder.created_at), 'dd MMM, HH:mm', { locale: es })}
+                  {format(new Date(selectedOrder.created_at), 'dd MMM, HH:mm')}
                 </Text>
               </View>
 
