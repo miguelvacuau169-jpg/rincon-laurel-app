@@ -58,7 +58,7 @@ export default function OrdersScreen() {
 
   const renderOrderItem = ({ item }: { item: any }) => {
     const orderDate = new Date(item.created_at);
-    const timeStr = format(orderDate, 'HH:mm', { locale: es });
+    const timeStr = format(orderDate, 'HH:mm');
 
     return (
       <TouchableOpacity
