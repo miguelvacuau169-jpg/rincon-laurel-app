@@ -143,6 +143,75 @@ export const api = {
   },
 };
 
+// API methods for new features
+export const apiExtended = {
+  // Categories
+  getCategories: async () => {
+    const response = await fetch(`${API_URL}/categories`);
+    return response.json();
+  },
+
+  createCategory: async (category: any) => {
+    const response = await fetch(`${API_URL}/categories`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(category),
+    });
+    return response.json();
+  },
+
+  updateCategory: async (id: string, category: any) => {
+    const response = await fetch(`${API_URL}/categories/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(category),
+    });
+    return response.json();
+  },
+
+  deleteCategory: async (id: string) => {
+    const response = await fetch(`${API_URL}/categories/${id}`, {
+      method: 'DELETE',
+    });
+    return response.json();
+  },
+
+  // Daily Stats
+  getDailyStats: async (date?: string) => {
+    const url = date ? `${API_URL}/daily-stats?date=${date}` : `${API_URL}/daily-stats`;
+    const response = await fetch(url);
+    return response.json();
+  },
+
+  // Daily Closures
+  getDailyClosures: async (limit: number = 30) => {
+    const response = await fetch(`${API_URL}/daily-closures?limit=${limit}`);
+    return response.json();
+  },
+
+  createDailyClosure: async (closure: any) => {
+    const response = await fetch(`${API_URL}/daily-closures`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(closure),
+    });
+    return response.json();
+  },
+
+  // Partial Payments
+  addPartialPayment: async (orderId: string, payment: any) => {
+    const response = await fetch(`${API_URL}/orders/${orderId}/partial-payment`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payment),
+    });
+    return response.json();
+  },
+};
+
+// Combine both APIs
+Object.assign(api, apiExtended);
+
 // Offline storage
 export const offlineStorage = {
   saveOrders: async (orders: any[]) => {
@@ -160,6 +229,15 @@ export const offlineStorage = {
 
   getProducts: async () => {
     const data = await AsyncStorage.getItem('offline_products');
+    return data ? JSON.parse(data) : [];
+  },
+
+  saveCategories: async (categories: any[]) => {
+    await AsyncStorage.setItem('offline_categories', JSON.stringify(categories));
+  },
+
+  getCategories: async () => {
+    const data = await AsyncStorage.getItem('offline_categories');
     return data ? JSON.parse(data) : [];
   },
 
