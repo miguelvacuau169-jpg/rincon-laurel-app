@@ -14,7 +14,6 @@ import { useApp } from '../../context/AppContext';
 import { Colors, StatusColors } from '../../constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
 import Modal from 'react-native-modal';
 
 export default function OrdersScreen() {
