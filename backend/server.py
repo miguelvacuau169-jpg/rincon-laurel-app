@@ -25,19 +25,12 @@ db = client[os.environ['DB_NAME']]
 sio = socketio.AsyncServer(
     async_mode='asgi',
     cors_allowed_origins='*',
-    logger=True,
-    engineio_logger=True
+    logger=False,
+    engineio_logger=False
 )
 
 # Create the main app
 app = FastAPI()
-
-# Create Socket.IO ASGI app
-socket_app = socketio.ASGIApp(
-    sio,
-    other_asgi_app=app,
-    socketio_path='/socket.io'
-)
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
