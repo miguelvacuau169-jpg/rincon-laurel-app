@@ -101,3 +101,221 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Aplicación móvil interna para restaurante El Rincón del Laurel - Sistema de gestión de pedidos en tiempo real con 3 empleados (2 camareros y 1 en barra). Incluye sincronización WebSocket, modo offline, notificaciones OneSignal, y unificación de pedidos."
+
+backend:
+  - task: "API REST - Productos (CRUD)"
+    implemented: true
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Implementado endpoints GET, POST, PUT, DELETE para productos. Endpoints: /api/products, /api/products/:id"
+          
+  - task: "API REST - Pedidos (CRUD)"
+    implemented: true
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Implementado endpoints GET, POST, PUT, DELETE para pedidos. Endpoints: /api/orders, /api/orders/:id. Incluye lógica de unificación de pedidos < 3 minutos"
+          
+  - task: "API REST - Configuración OneSignal"
+    implemented: true
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Implementado endpoints GET y PUT para /api/settings. Guarda App ID y API Key de OneSignal en MongoDB"
+          
+  - task: "API REST - Seed Data"
+    implemented: true
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Endpoint POST /api/seed para cargar 14 productos de ejemplo (comidas, bebidas, postres españoles típicos)"
+          
+  - task: "WebSocket - Tiempo Real"
+    implemented: true
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Socket.IO configurado con eventos: connect, disconnect, set_role, sync_request, order_created/updated/deleted, product_created/updated/deleted, notification"
+          
+  - task: "Lógica de Unificación de Pedidos"
+    implemented: true
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Función find_similar_orders() detecta pedidos creados en < 3 minutos con productos iguales y los marca como unified_with"
+          
+  - task: "Notificaciones (OneSignal placeholder)"
+    implemented: true
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Función send_notification() emite evento de Socket.IO cuando pedido pasa a 'listo'. Integración OneSignal API REST pendiente de credenciales del usuario"
+
+frontend:
+  - task: "Navegación y Routing (Expo Router)"
+    implemented: true
+    working: "NA"
+    file: "app/_layout.tsx, app/(tabs)/_layout.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Implementado layout principal con Stack navigation y tab navigation. 4 tabs: Pedidos, Nuevo Pedido, Productos, Configuración"
+          
+  - task: "Splash Screen y Selección de Rol"
+    implemented: true
+    working: "NA"
+    file: "app/index.tsx, app/role-selection.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Splash screen con logo del restaurante. Selección de rol: Barra, Camarero 1, Camarero 2. Guarda rol en AsyncStorage"
+          
+  - task: "Pantalla de Pedidos (Lista y Detalle)"
+    implemented: true
+    working: "NA"
+    file: "app/(tabs)/index.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Lista de pedidos con filtros por estado. Modal deslizable con detalle completo. Cambio de estado. Indicador online/offline. Actualización en tiempo real"
+          
+  - task: "Pantalla Nuevo Pedido"
+    implemented: true
+    working: "NA"
+    file: "app/(tabs)/new-order.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Formulario con número de mesa, selección de productos por categoría, carrito con cantidades, notas por producto y nota general. Cálculo automático de total"
+          
+  - task: "Pantalla Productos (CRUD)"
+    implemented: true
+    working: "NA"
+    file: "app/(tabs)/products.tsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Lista de productos con iconos por categoría. Modal para crear/editar productos. Botón para cargar datos de ejemplo. Actualización en tiempo real"
+          
+  - task: "Pantalla Configuración"
+    implemented: true
+    working: "NA"
+    file: "app/(tabs)/settings.tsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Formulario para OneSignal App ID y API Key. Información del rol actual. Botón para cambiar rol. Instrucciones para obtener credenciales OneSignal"
+          
+  - task: "Context API y Estado Global"
+    implemented: true
+    working: "NA"
+    file: "context/AppContext.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "AppContext maneja rol, orders, products, isOnline. Funciones para CRUD de orders y products. Callbacks para eventos Socket.IO. Feedback háptico"
+          
+  - task: "API Client y Socket.IO"
+    implemented: true
+    working: "NA"
+    file: "services/api.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Cliente API REST con fetch. Cliente Socket.IO con reconexión automática. Almacenamiento offline con AsyncStorage"
+          
+  - task: "Colores Corporativos y Diseño"
+    implemented: true
+    working: "NA"
+    file: "constants/Colors.ts"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Paleta extraída del logo: Marrón #6B5149, Verde turquesa #2D7A6B, Dorado #D4AF37, Beige #F5E6D3, Verde oliva #6B7A3E"
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "API REST - Productos (CRUD)"
+    - "API REST - Pedidos (CRUD)"
+    - "WebSocket - Tiempo Real"
+    - "API REST - Configuración OneSignal"
+    - "API REST - Seed Data"
+    - "Lógica de Unificación de Pedidos"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+    - agent: "main"
+      message: "Backend completamente implementado con FastAPI + Socket.IO + MongoDB. Incluye todos los endpoints REST, WebSocket para tiempo real, lógica de unificación de pedidos, y notificaciones. Frontend completamente implementado con Expo Router, 4 pantallas principales, Context API, Socket.IO client, y almacenamiento offline. Los datos de ejemplo (14 productos) ya están cargados. Un pedido de prueba fue creado exitosamente. Necesito testing completo del backend: endpoints REST, Socket.IO, y lógica de negocio."
