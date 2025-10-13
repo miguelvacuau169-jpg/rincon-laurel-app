@@ -246,25 +246,25 @@ export default function ProductsScreen() {
             <View style={styles.categoryButtons}>
               {categories.map((cat) => (
                 <TouchableOpacity
-                  key={cat.value}
+                  key={cat._id}
                   style={[
                     styles.categoryButton,
-                    category === cat.value && styles.categoryButtonActive,
+                    category === cat.name && styles.categoryButtonActive,
                   ]}
-                  onPress={() => setCategory(cat.value)}
+                  onPress={() => setCategory(cat.name)}
                 >
                   <Ionicons
                     name={cat.icon as any}
                     size={20}
-                    color={category === cat.value ? Colors.white : Colors.text}
+                    color={category === cat.name ? Colors.white : Colors.text}
                   />
                   <Text
                     style={[
                       styles.categoryButtonText,
-                      category === cat.value && styles.categoryButtonTextActive,
+                      category === cat.name && styles.categoryButtonTextActive,
                     ]}
                   >
-                    {cat.label}
+                    {cat.name}
                   </Text>
                 </TouchableOpacity>
               ))}
