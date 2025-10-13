@@ -308,16 +308,29 @@ export default function NewOrderScreen() {
                   <View style={styles.cartItemHeader}>
                     <View style={styles.cartItemInfo}>
                       <Text style={styles.cartItemName}>{item.name}</Text>
-                      <Text style={styles.cartItemPrice}>
-                        €{(item.price * item.quantity).toFixed(2)}
-                      </Text>
+                      <View style={styles.priceRow}>
+                        <Text style={styles.cartItemPrice}>
+                          €{(item.price * item.quantity).toFixed(2)}
+                        </Text>
+                        {item.price !== item.original_price && (
+                          <Text style={styles.priceModified}>(Modificado)</Text>
+                        )}
+                      </View>
                     </View>
-                    <TouchableOpacity
-                      style={styles.removeButton}
-                      onPress={() => removeFromCart(item.product_id)}
-                    >
-                      <Ionicons name="trash" size={20} color={Colors.error} />
-                    </TouchableOpacity>
+                    <View style={styles.cartItemActions}>
+                      <TouchableOpacity
+                        style={styles.editButton}
+                        onPress={() => openEditPriceModal(item)}
+                      >
+                        <Ionicons name="pencil" size={18} color={Colors.secondary} />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.removeButton}
+                        onPress={() => removeFromCart(item.product_id)}
+                      >
+                        <Ionicons name="trash" size={18} color={Colors.error} />
+                      </TouchableOpacity>
+                    </View>
                   </View>
 
                   <View style={styles.cartItemControls}>
