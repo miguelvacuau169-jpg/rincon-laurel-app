@@ -470,7 +470,7 @@ export default function OrdersScreen() {
         <View style={styles.smallModalContent}>
           <Text style={styles.smallModalTitle}>Cobro Parcial</Text>
           <Text style={styles.smallModalSubtitle}>
-            Pendiente: €{selectedOrder?.pending_amount.toFixed(2)}
+            Pendiente: €{(selectedOrder?.pending_amount || selectedOrder?.total || 0).toFixed(2)}
           </Text>
           
           <Text style={styles.selectProductsLabel}>Selecciona productos pagados:</Text>
