@@ -11,6 +11,7 @@ import {
   Platform,
   Alert,
 } from 'react-native';
+import Modal from 'react-native-modal';
 import { useApp } from '../../context/AppContext';
 import { Colors } from '../../constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
