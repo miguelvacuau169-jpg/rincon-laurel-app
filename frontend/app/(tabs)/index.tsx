@@ -38,7 +38,7 @@ export default function OrdersScreen() {
 
   const filteredOrders = orders.filter((order) => {
     if (filter !== 'all' && order.status !== filter) return false;
-    if (zoneFilter !== 'all' && order.zone !== zoneFilter) return false;
+    if (zoneFilter !== 'all' && (order.zone || 'terraza_exterior') !== zoneFilter) return false;
     return true;
   });
 
