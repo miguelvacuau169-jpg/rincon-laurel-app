@@ -44,9 +44,26 @@ export default function OrdersScreen() {
 
   const handleStatusChange = async (order: any, newStatus: string) => {
     try {
-      await updateOrder(order._id, { ...order, status: newStatus });
+      const updatedOrder = {
+        table_number: order.table_number,
+        zone: order.zone || 'terraza_exterior',
+        waiter_role: order.waiter_role,
+        products: order.products,
+        total: order.total,
+        paid_amount: order.paid_amount || 0,
+        pending_amount: order.pending_amount || order.total,
+        status: newStatus,
+        payment_method: order.payment_method,
+        partial_payments: order.partial_payments || [],
+        special_note: order.special_note,
+        unified_with: order.unified_with || [],
+      };
+      await updateOrder(order._id, updatedOrder);
+      // Actualizar el estado local inmediatamente
+      setSelectedOrder({ ...order, status: newStatus });
     } catch (error) {
       console.error('Error updating status:', error);
+      Alert.alert('Error', 'No se pudo cambiar el estado del pedido');
     }
   };
 
