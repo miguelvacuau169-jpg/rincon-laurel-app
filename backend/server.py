@@ -641,6 +641,9 @@ async def seed_data():
         if product_count > 0 and category_count > 0:
             return {"message": "Data already seeded"}
         
+        categories_count = 0
+        products_count = 0
+        
         # Seed categories
         if category_count == 0:
             categories = [
@@ -652,6 +655,7 @@ async def seed_data():
                 {"name": "Postres", "icon": "ice-cream", "created_at": datetime.utcnow()},
             ]
             await db.categories.insert_many(categories)
+            categories_count = len(categories)
         
         # Seed products
         if product_count == 0:
@@ -687,8 +691,9 @@ async def seed_data():
             ]
             
             await db.products.insert_many(sample_products)
+            products_count = len(sample_products)
         
-        return {"message": "Data seeded successfully", "products_count": len(sample_products), "categories_count": len(categories)}
+        return {"message": "Data seeded successfully", "products_count": products_count, "categories_count": categories_count}
     except Exception as e:
         logger.error(f"Error seeding data: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
