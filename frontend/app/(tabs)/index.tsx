@@ -112,9 +112,16 @@ export default function OrdersScreen() {
       return;
     }
 
-    const updatedProducts = selectedOrder.products.map((p: any) =>
-      p.product_id === editingProduct.product_id ? { ...p, price } : p
-    );
+    const updatedProducts = selectedOrder.products.map((p: any) => ({
+      product_id: p.product_id,
+      name: p.name,
+      category: p.category,
+      price: p.product_id === editingProduct.product_id ? price : p.price,
+      original_price: p.original_price || p.price,
+      quantity: p.quantity,
+      note: p.note || '',
+      is_paid: p.is_paid || false,
+    }));
 
     // Recalcular total
     const newTotal = updatedProducts.reduce((sum: number, p: any) => sum + (p.price * p.quantity), 0);
@@ -126,20 +133,16 @@ export default function OrdersScreen() {
         waiter_role: selectedOrder.waiter_role,
         products: updatedProducts,
         total: newTotal,
-        paid_amount: selectedOrder.paid_amount || 0,
-        pending_amount: newTotal - (selectedOrder.paid_amount || 0),
         status: selectedOrder.status,
-        payment_method: selectedOrder.payment_method,
-        partial_payments: selectedOrder.partial_payments || [],
-        special_note: selectedOrder.special_note,
-        unified_with: selectedOrder.unified_with || [],
+        payment_method: selectedOrder.payment_method || null,
+        special_note: selectedOrder.special_note || null,
       };
       
-      await updateOrder(selectedOrder._id, updatedOrder);
+      const result = await updateOrder(selectedOrder._id, updatedOrder);
       setEditingProduct(null);
       setNewPrice('');
-      // Actualizar estado local
-      setSelectedOrder({ ...selectedOrder, products: updatedProducts, total: newTotal, pending_amount: newTotal - (selectedOrder.paid_amount || 0) });
+      // Actualizar estado local con el resultado
+      setSelectedOrder(result);
     } catch (error) {
       console.error('Error updating price:', error);
       Alert.alert('Error', 'No se pudo actualizar el precio');
