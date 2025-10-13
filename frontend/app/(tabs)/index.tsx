@@ -147,7 +147,7 @@ export default function OrdersScreen() {
     const orderDate = new Date(item.created_at);
     const timeStr = format(orderDate, 'HH:mm');
 
-    const zoneLabel = zones.find((z) => z.value === item.zone)?.label || item.zone;
+    const zoneLabel = zones.find((z) => z.value === (item.zone || 'terraza_exterior'))?.label || (item.zone || 'Terraza Ext.');
 
     return (
       <TouchableOpacity
