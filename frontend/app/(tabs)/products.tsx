@@ -18,19 +18,19 @@ import Modal from 'react-native-modal';
 import { api } from '../../services/api';
 
 export default function ProductsScreen() {
-  const { products, refreshData, createProduct, updateProduct, deleteProduct } = useApp();
+  const { products, categories, refreshData, createProduct, updateProduct, deleteProduct } = useApp();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [name, setName] = useState('');
-  const [category, setCategory] = useState('comida');
+  const [category, setCategory] = useState('');
   const [price, setPrice] = useState('');
   const [seedLoading, setSeedLoading] = useState(false);
 
-  const categories = [
-    { value: 'comida', label: 'Comida', icon: 'restaurant' },
-    { value: 'bebida', label: 'Bebida', icon: 'beer' },
-    { value: 'postre', label: 'Postre', icon: 'ice-cream' },
-  ];
+  useEffect(() => {
+    if (categories.length > 0 && !category) {
+      setCategory(categories[0].name);
+    }
+  }, [categories]);
 
   const handleSeedData = async () => {
     Alert.alert(
