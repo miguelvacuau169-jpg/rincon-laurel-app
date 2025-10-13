@@ -100,18 +100,18 @@ class PartialPayment(BaseModel):
 class Order(BaseModel):
     id: Optional[str] = Field(alias="_id", default=None)
     table_number: int
-    zone: str  # terraza_exterior, salon_interior, terraza_interior
+    zone: Optional[str] = "terraza_exterior"  # terraza_exterior, salon_interior, terraza_interior
     waiter_role: str  # barra, camarero_1, camarero_2, administrador
     products: List[OrderProduct]
     total: float
-    paid_amount: float = 0.0
-    pending_amount: float = 0.0
+    paid_amount: Optional[float] = 0.0
+    pending_amount: Optional[float] = 0.0
     status: str = "pendiente"
     payment_method: Optional[str] = None  # efectivo, tarjeta, ambos
-    partial_payments: List[PartialPayment] = []
+    partial_payments: Optional[List[PartialPayment]] = []
     special_note: Optional[str] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: Optional[datetime] = Field(default_factory=datetime.utcnow)
+    updated_at: Optional[datetime] = Field(default_factory=datetime.utcnow)
     unified_with: Optional[List[str]] = []
 
     class Config:
