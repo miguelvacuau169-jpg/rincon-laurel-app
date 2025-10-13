@@ -543,15 +543,17 @@ async def get_daily_stats(date: Optional[str] = None):
         mixed_sales = 0
         
         for order in orders:
-            total_sales += order.get('paid_amount', 0)
+            # Si está entregado, usar el total (asumimos que está pagado completamente)
+            amount = order.get('total', 0)
+            total_sales += amount
             
             payment_method = order.get('payment_method', '')
             if payment_method == 'efectivo':
-                cash_sales += order.get('paid_amount', 0)
+                cash_sales += amount
             elif payment_method == 'tarjeta':
-                card_sales += order.get('paid_amount', 0)
+                card_sales += amount
             elif payment_method == 'ambos':
-                mixed_sales += order.get('paid_amount', 0)
+                mixed_sales += amount
         
         return {
             'date': target_date.isoformat(),
