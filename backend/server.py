@@ -85,7 +85,7 @@ class OrderProduct(BaseModel):
     name: str
     category: str
     price: float
-    original_price: float
+    original_price: Optional[float] = None
     quantity: int = 1
     note: Optional[str] = None
     is_paid: bool = False
