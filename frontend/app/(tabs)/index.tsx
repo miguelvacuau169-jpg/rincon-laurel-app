@@ -387,7 +387,7 @@ export default function OrdersScreen() {
                 {(selectedOrder.pending_amount || 0) > 0 && (
                   <View style={styles.paymentRow}>
                     <Text style={styles.paymentLabel}>Pendiente</Text>
-                    <Text style={styles.pendingAmount">€{(selectedOrder.pending_amount || 0).toFixed(2)}</Text>
+                    <Text style={styles.pendingAmount}>€{(selectedOrder.pending_amount || 0).toFixed(2)}</Text>
                   </View>
                 )}
               </View>
