@@ -107,16 +107,33 @@ export default function OrdersScreen() {
       p.product_id === editingProduct.product_id ? { ...p, price } : p
     );
 
+    // Recalcular total
+    const newTotal = updatedProducts.reduce((sum: number, p: any) => sum + (p.price * p.quantity), 0);
+
     try {
-      await updateOrder(selectedOrder._id, {
-        ...selectedOrder,
+      const updatedOrder = {
+        table_number: selectedOrder.table_number,
+        zone: selectedOrder.zone || 'terraza_exterior',
+        waiter_role: selectedOrder.waiter_role,
         products: updatedProducts,
-      });
+        total: newTotal,
+        paid_amount: selectedOrder.paid_amount || 0,
+        pending_amount: newTotal - (selectedOrder.paid_amount || 0),
+        status: selectedOrder.status,
+        payment_method: selectedOrder.payment_method,
+        partial_payments: selectedOrder.partial_payments || [],
+        special_note: selectedOrder.special_note,
+        unified_with: selectedOrder.unified_with || [],
+      };
+      
+      await updateOrder(selectedOrder._id, updatedOrder);
       setEditingProduct(null);
       setNewPrice('');
-      setSelectedOrder({ ...selectedOrder, products: updatedProducts });
+      // Actualizar estado local
+      setSelectedOrder({ ...selectedOrder, products: updatedProducts, total: newTotal, pending_amount: newTotal - (selectedOrder.paid_amount || 0) });
     } catch (error) {
       console.error('Error updating price:', error);
+      Alert.alert('Error', 'No se pudo actualizar el precio');
     }
   };
 
