@@ -663,4 +663,84 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: Colors.white,
   },
+  priceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  priceModified: {
+    fontSize: 11,
+    color: Colors.warning,
+    fontStyle: 'italic',
+  },
+  cartItemActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  editButton: {
+    padding: 8,
+  },
+  modal: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: Colors.white,
+    borderRadius: 20,
+    padding: 24,
+    width: '85%',
+    maxWidth: 400,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: Colors.primary,
+    marginBottom: 8,
+  },
+  modalSubtitle: {
+    fontSize: 16,
+    color: Colors.text,
+    marginBottom: 8,
+  },
+  originalPrice: {
+    fontSize: 14,
+    color: Colors.gray,
+    marginBottom: 16,
+  },
+  priceInput: {
+    backgroundColor: Colors.background,
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 16,
+    color: Colors.text,
+    borderWidth: 1,
+    borderColor: Colors.lightGray,
+    marginBottom: 20,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  cancelButton: {
+    backgroundColor: Colors.lightGray,
+  },
+  saveButton: {
+    backgroundColor: Colors.secondary,
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.text,
+  },
+  saveButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.white,
+  },
 });
