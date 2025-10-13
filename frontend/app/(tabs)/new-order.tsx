@@ -384,6 +384,45 @@ export default function NewOrderScreen() {
           )}
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Modal de editar precio */}
+      <Modal
+        isVisible={editingCartItem !== null}
+        onBackdropPress={() => setEditingCartItem(null)}
+        style={styles.modal}
+      >
+        {editingCartItem && (
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Editar Precio</Text>
+            <Text style={styles.modalSubtitle}>{editingCartItem.name}</Text>
+            <Text style={styles.originalPrice}>
+              Precio original: €{editingCartItem.original_price.toFixed(2)}
+            </Text>
+            <TextInput
+              style={styles.priceInput}
+              placeholder="Nuevo precio"
+              placeholderTextColor={Colors.gray}
+              value={editPrice}
+              onChangeText={setEditPrice}
+              keyboardType="decimal-pad"
+            />
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => setEditingCartItem(null)}
+              >
+                <Text style={styles.cancelButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.saveButton]}
+                onPress={handleSaveEditPrice}
+              >
+                <Text style={styles.saveButtonText}>Guardar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+      </Modal>
     </SafeAreaView>
   );
 }
