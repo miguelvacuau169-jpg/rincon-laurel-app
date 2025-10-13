@@ -392,7 +392,7 @@ export default function OrdersScreen() {
                 )}
               </View>
 
-              {selectedOrder.pending_amount > 0 && (
+              {(selectedOrder.pending_amount || 0) > 0 && (
                 <TouchableOpacity
                   style={styles.partialPaymentButton}
                   onPress={openPartialPaymentModal}
