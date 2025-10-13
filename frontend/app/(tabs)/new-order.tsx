@@ -107,6 +107,31 @@ export default function NewOrderScreen() {
     setCart(newCart);
   };
 
+  const openEditPriceModal = (item: CartProduct) => {
+    setEditingCartItem(item);
+    setEditPrice(item.price.toString());
+  };
+
+  const handleSaveEditPrice = () => {
+    if (!editingCartItem) return;
+
+    const newPrice = parseFloat(editPrice);
+    if (isNaN(newPrice) || newPrice < 0) {
+      Alert.alert('Error', 'Precio inválido');
+      return;
+    }
+
+    const newCart = cart.map((item) => {
+      if (item.product_id === editingCartItem.product_id) {
+        return { ...item, price: newPrice };
+      }
+      return item;
+    });
+    setCart(newCart);
+    setEditingCartItem(null);
+    setEditPrice('');
+  };
+
   const calculateTotal = () => {
     return cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   };
