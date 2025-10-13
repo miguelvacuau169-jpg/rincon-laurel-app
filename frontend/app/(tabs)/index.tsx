@@ -197,8 +197,8 @@ export default function OrdersScreen() {
           </View>
           <View style={styles.orderBodyRight}>
             <Text style={styles.totalText}>€{item.total.toFixed(2)}</Text>
-            {item.pending_amount > 0 && (
-              <Text style={styles.pendingText}>Pendiente: €{item.pending_amount.toFixed(2)}</Text>
+            {(item.pending_amount || 0) > 0 && (
+              <Text style={styles.pendingText}>Pendiente: €{(item.pending_amount || 0).toFixed(2)}</Text>
             )}
           </View>
         </View>
