@@ -36,6 +36,8 @@ export default function NewOrderScreen() {
   const [specialNote, setSpecialNote] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [paymentMethod, setPaymentMethod] = useState('efectivo');
+  const [editingCartItem, setEditingCartItem] = useState<CartProduct | null>(null);
+  const [editPrice, setEditPrice] = useState('');
 
   const zones = [
     { value: 'terraza_exterior', label: 'Terraza Exterior', icon: 'sunny' },
