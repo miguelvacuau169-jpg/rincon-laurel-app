@@ -134,7 +134,7 @@ export default function ProductsScreen() {
   };
 
   const renderProductItem = ({ item }: { item: any }) => {
-    const categoryData = categories.find((c) => c.value === item.category);
+    const categoryData = categories.find((c) => c.name === item.category);
 
     return (
       <View style={styles.productCard}>
@@ -148,7 +148,7 @@ export default function ProductsScreen() {
           </View>
           <View style={styles.productInfo}>
             <Text style={styles.productName}>{item.name}</Text>
-            <Text style={styles.productCategory}>{categoryData?.label}</Text>
+            <Text style={styles.productCategory}>{item.category}</Text>
           </View>
         </View>
 
