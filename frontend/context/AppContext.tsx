@@ -217,8 +217,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const updateOrder = async (id: string, order: any) => {
     try {
-      await api.updateOrder(id, order);
+      const updatedOrder = await api.updateOrder(id, order);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      // Actualizar el estado local inmediatamente
+      setOrders((prev) =>
+        prev.map((o) => (o._id === id ? updatedOrder : o))
+      );
+      return updatedOrder;
     } catch (error) {
       console.error('Error updating order:', error);
       Alert.alert('Error', 'No se pudo actualizar el pedido');
