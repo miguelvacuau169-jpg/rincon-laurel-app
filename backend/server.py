@@ -542,11 +542,22 @@ async def get_daily_stats(date: Optional[str] = None):
         cash_sales = 0
         card_sales = 0
         mixed_sales = 0
+        zone_breakdown = {
+            'terraza_exterior': {'sales': 0, 'orders': 0},
+            'salon_interior': {'sales': 0, 'orders': 0},
+            'terraza_interior': {'sales': 0, 'orders': 0}
+        }
         
         for order in orders:
             # Si está entregado, usar el total (asumimos que está pagado completamente)
             amount = order.get('total', 0)
             total_sales += amount
+            
+            # Agregar a zona
+            zone = order.get('zone', 'terraza_exterior')
+            if zone in zone_breakdown:
+                zone_breakdown[zone]['sales'] += amount
+                zone_breakdown[zone]['orders'] += 1
             
             payment_method = order.get('payment_method', '')
             if payment_method == 'efectivo':
@@ -556,13 +567,18 @@ async def get_daily_stats(date: Optional[str] = None):
             elif payment_method == 'ambos':
                 mixed_sales += amount
         
+        # Redondear valores en zone_breakdown
+        for zone in zone_breakdown:
+            zone_breakdown[zone]['sales'] = round(zone_breakdown[zone]['sales'], 2)
+        
         return {
             'date': target_date.isoformat(),
             'total_sales': round(total_sales, 2),
             'cash_sales': round(cash_sales, 2),
             'card_sales': round(card_sales, 2),
             'mixed_sales': round(mixed_sales, 2),
-            'total_orders': len(orders)
+            'total_orders': len(orders),
+            'zone_breakdown': zone_breakdown
         }
     except Exception as e:
         logger.error(f"Error getting daily stats: {str(e)}")
