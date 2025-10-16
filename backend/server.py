@@ -534,9 +534,14 @@ async def get_daily_stats(date: Optional[str] = None):
         start_of_day = target_date.replace(hour=0, minute=0, second=0, microsecond=0)
         end_of_day = target_date.replace(hour=23, minute=59, second=59, microsecond=999999)
         
+        # Obtener solo pedidos que NO hayan sido cerrados aún
         orders = await db.orders.find({
             'created_at': {'$gte': start_of_day, '$lte': end_of_day},
-            'status': 'entregado'
+            'status': 'entregado',
+            '$or': [
+                {'closed_date': None},
+                {'closed_date': {'$exists': False}}
+            ]
         }).to_list(1000)
         
         total_sales = 0
