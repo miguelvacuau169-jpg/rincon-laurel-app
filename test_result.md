@@ -167,11 +167,11 @@ backend:
 
   - task: "Daily Closure Reset con closed_date"
     implemented: true
-    working: "NA"
+    working: false
     file: "server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: false
           agent: "user"
@@ -179,6 +179,9 @@ backend:
         - working: "NA"
           agent: "main"
           comment: "FIXES APLICADOS: 1) Agregado campo closed_date al modelo Order, 2) Modificado daily-stats para filtrar pedidos ya cerrados (closed_date IS NULL), 3) Modificado create_daily_closure para: a) Verificar si ya existe cierre para hoy (error 400), b) Marcar todos pedidos entregados del día con closed_date, c) Emitir evento daily_closure_created vía WebSocket. Ahora cerrar día marca pedidos como cerrados y stats solo muestra pedidos no cerrados."
+        - working: false
+          agent: "testing"
+          comment: "❌ CRITICAL BUG CONFIRMED: Daily closure functionality is BROKEN. Testing revealed: 1) 8 closures exist for today but 0 orders have closed_date field, 2) Daily stats still show 428€ sales and 9 orders despite closures, 3) MongoDB update_many query in create_daily_closure is NOT working - orders are never marked as closed, 4) Duplicate closure prevention works (returns 400), 5) WebSocket event not found in logs. ROOT CAUSE: The update_many query at lines 615-627 in server.py is failing silently - no orders are being updated with closed_date. This is a critical business logic failure."
           
   - task: "API REST - Configuración OneSignal"
     implemented: true
