@@ -468,15 +468,13 @@ metadata:
 
 test_plan:
   current_focus:
-    - "App Navigation and Routing Fix"
-    - "Splash Screen to Role Selection Transition"
+    - "Splash Screen Auto-Navigation Fix"
+    - "Daily Closure Backend Reset Bug"
   stuck_tasks: 
-    - "Category Icons Visibility Fix"
+    - "App Navigation and Splash Screen Fix"
     - "WebSocket Real-time Updates & Performance"
-    - "Partial Payment Flow con Payment Method"
-    - "Daily Closure con Zone Breakdown y PDF"
   test_all: false
-  test_priority: "stuck_first"
+  test_priority: "critical_first"
 
 agent_communication:
     - agent: "main"
