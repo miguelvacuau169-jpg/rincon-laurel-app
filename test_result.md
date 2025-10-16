@@ -384,12 +384,17 @@ frontend:
 
 metadata:
   created_by: "main_agent"
-  version: "1.0"
-  test_sequence: 1
+  version: "1.1"
+  test_sequence: 2
   run_ui: false
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "API Daily Stats con Zona Breakdown"
+    - "API Weekly Stats"
+    - "Auto-delete Daily Closures >7 días"
+    - "Partial Payment Flow con Payment Method"
+    - "Daily Closure con Zone Breakdown y PDF"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -399,3 +404,5 @@ agent_communication:
       message: "Backend completamente implementado con FastAPI + Socket.IO + MongoDB. Incluye todos los endpoints REST, WebSocket para tiempo real, lógica de unificación de pedidos, y notificaciones. Frontend completamente implementado con Expo Router, 4 pantallas principales, Context API, Socket.IO client, y almacenamiento offline. Los datos de ejemplo (14 productos) ya están cargados. Un pedido de prueba fue creado exitosamente. Necesito testing completo del backend: endpoints REST, Socket.IO, y lógica de negocio."
     - agent: "testing"
       message: "✅ BACKEND TESTING COMPLETADO - Todos los endpoints REST funcionando perfectamente. Probados: Products CRUD (6/6 tests), Orders CRUD (6/6 tests), Settings API (4/4 tests), Seed Data (1/1 test), Business Logic (2/2 tests). Total: 19/19 tests PASSED. Base de datos con 14 productos de ejemplo ya cargados, 1 pedido existente. Lógica de unificación, serialización de datetime y ObjectId funcionando correctamente. WebSocket no probado según instrucciones. Backend listo para producción."
+    - agent: "main"
+      message: "ACTUALIZACIÓN IMPORTANTE - Implementadas las siguientes mejoras: 1) BACKEND: Agregado zone_breakdown a daily stats, nuevo endpoint weekly-stats, auto-eliminación de closures >7 días, 2) FRONTEND: Corregido app freezing en partial payments (eliminado duplicate state, agregados estilos faltantes), implementado keyboard dismissal, agregado selector de payment method en partial payment modal, 3) DAILY CLOSURE: Instalado expo-print/expo-sharing, implementada generación de PDFs diarios y semanales con logo y colores corporativos, agregada visualización de zone breakdown. NECESITO: Testing de nuevos endpoints backend (daily-stats con zones, weekly-stats) y testing completo de partial payments en frontend."
