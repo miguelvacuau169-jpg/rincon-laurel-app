@@ -593,6 +593,10 @@ async def create_daily_closure(closure: DailyClosure):
         result = await db.daily_closures.insert_one(closure_dict)
         closure_dict['_id'] = str(result.inserted_id)
         
+        # Eliminar cierres más antiguos de 7 días
+        seven_days_ago = datetime.utcnow() - timedelta(days=7)
+        await db.daily_closures.delete_many({'date': {'$lt': seven_days_ago}})
+        
         return serialize_doc(closure_dict)
     except Exception as e:
         logger.error(f"Error creating daily closure: {str(e)}")
