@@ -339,29 +339,23 @@ class BackendTester:
                 self.created_orders.remove(order_id)
                 print(f"   Deleted order {order_id}")
         
-        # Delete created products  
-        for product_id in self.created_products[:]:
-            result = self.make_request("DELETE", f"/products/{product_id}")
-            if result["success"]:
-                self.created_products.remove(product_id)
-                print(f"   Deleted product {product_id}")
+        # Note: We don't delete closures as they are part of the business logic test
 
     def run_all_tests(self):
-        """Run all backend tests"""
+        """Run all backend tests for the 3 specific endpoints"""
         print(f"🚀 Starting Backend API Tests for El Rincón del Laurel")
         print(f"📍 Base URL: {BASE_URL}")
         print(f"⏰ Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        print(f"🎯 Testing NEW/UPDATED endpoints: daily-stats, weekly-stats, daily-closures")
         
         try:
-            # Test API availability
-            self.test_api_root()
+            # Create test data if needed
+            self.create_test_order_if_needed()
             
-            # Test all endpoints
-            self.test_products_crud()
-            self.test_orders_crud()
-            self.test_order_unification_logic()
-            self.test_settings_api()
-            self.test_seed_data()
+            # Test the 3 specific endpoints requested
+            self.test_daily_stats_with_zones()
+            self.test_weekly_stats()
+            self.test_daily_closures_auto_delete()
             
         finally:
             # Always cleanup
