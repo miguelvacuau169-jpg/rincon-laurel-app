@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Aplicación móvil interna para restaurante El Rincón del Laurel - Sistema de gestión de pedidos en tiempo real con 3 empleados (2 camareros y 1 en barra). Incluye sincronización WebSocket, modo offline, notificaciones OneSignal, y unificación de pedidos."
+user_problem_statement: "Aplicación móvil interna para restaurante El Rincón del Laurel - Sistema de gestión de pedidos en tiempo real con 3 empleados (2 camareros y 1 en barra). Incluye sincronización WebSocket, modo offline, notificaciones OneSignal, unificación de pedidos, zonas de restaurante, pagos parciales, edición dinámica de precios, gestión de categorías, cierre diario con resumen de ventas, y generación de PDFs."
 
 backend:
   - task: "API REST - Productos (CRUD)"
@@ -134,6 +134,42 @@ backend:
         - working: true
           agent: "testing"
           comment: "✅ PASSED - Todos los endpoints CRUD funcionando correctamente. GET /orders retorna pedidos existentes, POST crea pedidos con cálculo correcto de totales, GET /:id obtiene pedido específico, PUT actualiza estado, DELETE elimina pedidos. Serialización de datetime correcta (created_at, updated_at)."
+
+  - task: "API Daily Stats con Zona Breakdown"
+    implemented: true
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Actualizado endpoint /api/daily-stats para incluir desglose por zonas (terraza_exterior, salon_interior, terraza_interior). Retorna ventas y pedidos por zona."
+
+  - task: "API Weekly Stats"
+    implemented: true
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Nuevo endpoint /api/weekly-stats para obtener estadísticas de los últimos 7 días. Incluye ventas por zona, por método de pago, y desglose diario."
+
+  - task: "Auto-delete Daily Closures >7 días"
+    implemented: true
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Agregada lógica automática para eliminar cierres diarios con más de 7 días de antigüedad al crear un nuevo cierre."
           
   - task: "API REST - Configuración OneSignal"
     implemented: true
