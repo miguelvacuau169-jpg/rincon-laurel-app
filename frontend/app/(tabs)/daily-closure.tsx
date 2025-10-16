@@ -505,6 +505,26 @@ export default function DailyClosureScreen() {
                   {loading ? 'Cerrando...' : 'Cerrar Día'}
                 </Text>
               </TouchableOpacity>
+
+              <View style={styles.pdfButtons}>
+                <TouchableOpacity
+                  style={styles.pdfButton}
+                  onPress={generateDailyPDF}
+                  disabled={generatingPDF}
+                >
+                  <Ionicons name="document-text" size={20} color={Colors.secondary} />
+                  <Text style={styles.pdfButtonText}>PDF Diario</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.pdfButton}
+                  onPress={generateWeeklyPDF}
+                  disabled={generatingPDF}
+                >
+                  <Ionicons name="calendar" size={20} color={Colors.secondary} />
+                  <Text style={styles.pdfButtonText}>PDF Semanal</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           ) : (
             <View style={styles.loadingCard}>
