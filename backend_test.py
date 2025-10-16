@@ -28,6 +28,43 @@ class DailyClosureTestSuite:
         self.test_results.append(result)
         print(result)
         
+    def cleanup_existing_closures(self):
+        """Clean up existing closures for today to allow fresh testing"""
+        print("\n=== CLEANUP: Eliminando cierres existentes de hoy ===")
+        
+        try:
+            # Get existing closures
+            response = requests.get(f"{self.base_url}/daily-closures")
+            if response.status_code != 200:
+                self.log_test("Cleanup - Get Closures", False, f"Status: {response.status_code}")
+                return False
+            
+            closures = response.json()
+            today = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+            
+            # Find closures from today
+            today_closures = []
+            for closure in closures:
+                closure_date = datetime.fromisoformat(closure['date'].replace('Z', '+00:00'))
+                if closure_date >= today:
+                    today_closures.append(closure)
+            
+            print(f"Cierres de hoy encontrados: {len(today_closures)}")
+            
+            # Note: We can't delete closures via API, but we can document this issue
+            if today_closures:
+                print("⚠️  ISSUE DETECTED: Existing closures found but orders not marked as closed")
+                self.log_test("Cleanup - Closure Bug Detected", False, 
+                             f"Found {len(today_closures)} closures but orders still show in daily-stats")
+                return False
+            
+            self.log_test("Cleanup - No Existing Closures", True, "Ready for fresh testing")
+            return True
+            
+        except Exception as e:
+            self.log_test("Cleanup - Exception", False, str(e))
+            return False
+
     def setup_test_data(self):
         """Setup: Create delivered orders for testing if needed"""
         print("\n=== SETUP: Verificando pedidos entregados ===")
@@ -41,17 +78,17 @@ class DailyClosureTestSuite:
                 
             orders = response.json()
             
-            # Count delivered orders from today
+            # Count delivered orders from today that are NOT closed
             today = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
             delivered_today = []
             
             for order in orders:
                 if order.get('status') == 'entregado':
                     created_at = datetime.fromisoformat(order['created_at'].replace('Z', '+00:00'))
-                    if created_at >= today:
+                    if created_at >= today and not order.get('closed_date'):
                         delivered_today.append(order)
             
-            print(f"Pedidos entregados hoy encontrados: {len(delivered_today)}")
+            print(f"Pedidos entregados NO cerrados hoy: {len(delivered_today)}")
             
             # Create test orders if we need more
             orders_needed = max(0, 2 - len(delivered_today))
