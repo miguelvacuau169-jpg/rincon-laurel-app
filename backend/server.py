@@ -126,6 +126,7 @@ class DailyClosure(BaseModel):
     card_sales: float
     mixed_sales: float
     total_orders: int
+    zone_breakdown: Optional[dict] = {}  # { 'terraza_exterior': {...}, 'salon_interior': {...}, 'terraza_interior': {...} }
     closed_by: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
