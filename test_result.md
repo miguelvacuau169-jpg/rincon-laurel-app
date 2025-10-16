@@ -444,11 +444,15 @@ metadata:
 
 test_plan:
   current_focus:
+    - "App Navigation and Routing Fix"
+    - "Splash Screen to Role Selection Transition"
+  stuck_tasks: 
+    - "Category Icons Visibility Fix"
+    - "WebSocket Real-time Updates & Performance"
     - "Partial Payment Flow con Payment Method"
     - "Daily Closure con Zone Breakdown y PDF"
-  stuck_tasks: []
   test_all: false
-  test_priority: "high_first"
+  test_priority: "stuck_first"
 
 agent_communication:
     - agent: "main"
