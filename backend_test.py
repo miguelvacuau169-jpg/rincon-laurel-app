@@ -1,19 +1,17 @@
 #!/usr/bin/env python3
 """
-Backend API Testing for El Rincón del Laurel Restaurant App
-Testing specific endpoints: daily-stats, weekly-stats, daily-closures
-Focus on NEW/UPDATED endpoints as requested
+Backend Test Suite for El Rincón del Laurel - Daily Closure Critical Testing
+Testing the daily closure functionality with sales reset as requested.
 """
 
 import requests
 import json
-import time
 from datetime import datetime, timedelta
-from typing import Dict, List, Any
+import time
+import sys
 
-# Configuration
-BASE_URL = "https://resto-manager-100.preview.emergentagent.com/api"
-TIMEOUT = 30
+# Get backend URL from frontend .env
+BACKEND_URL = "https://resto-manager-100.preview.emergentagent.com/api"
 
 class BackendTester:
     def __init__(self):
