@@ -712,4 +712,61 @@ const styles = StyleSheet.create({
     color: Colors.gray,
     marginTop: 16,
   },
+  zoneSection: {
+    marginVertical: 16,
+  },
+  zoneSectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 12,
+  },
+  zoneRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.lightGray,
+  },
+  zoneLabel: {
+    fontSize: 14,
+    color: Colors.text,
+    fontWeight: '500',
+  },
+  zoneData: {
+    alignItems: 'flex-end',
+  },
+  zoneValue: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.secondary,
+  },
+  zoneOrders: {
+    fontSize: 12,
+    color: Colors.gray,
+    marginTop: 2,
+  },
+  pdfButtons: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 12,
+  },
+  pdfButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.white,
+    borderWidth: 2,
+    borderColor: Colors.secondary,
+    borderRadius: 12,
+    padding: 12,
+    gap: 8,
+  },
+  pdfButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.secondary,
+  },
 });
