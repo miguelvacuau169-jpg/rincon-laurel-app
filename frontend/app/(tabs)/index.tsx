@@ -149,10 +149,13 @@ export default function OrdersScreen() {
     }
   };
 
+  const [partialPaymentMethod, setPartialPaymentMethod] = useState('efectivo');
+
   const openPartialPaymentModal = () => {
     setPartialPaymentModalVisible(true);
     setPartialAmount('');
     setSelectedProductsForPayment([]);
+    setPartialPaymentMethod('efectivo');
   };
 
   const toggleProductForPayment = (productId: string) => {
@@ -166,19 +169,62 @@ export default function OrdersScreen() {
   const handlePartialPayment = async () => {
     if (!selectedOrder) return;
 
-    const amount = parseFloat(partialAmount);
-    if (isNaN(amount) || amount <= 0) {
-      Alert.alert('Error', 'Monto inválido');
+    if (selectedProductsForPayment.length === 0 && !partialAmount) {
+      Alert.alert('Error', 'Selecciona productos o ingresa un monto');
       return;
     }
 
     try {
-      await api.addPartialPayment(selectedOrder._id, {
-        amount,
-        payment_method: selectedOrder.payment_method || 'efectivo',
+      // Calcular monto basado en productos seleccionados
+      let calculatedAmount = 0;
+      if (selectedProductsForPayment.length > 0) {
+        calculatedAmount = selectedOrder.products
+          .filter((p: any) => selectedProductsForPayment.includes(p.product_id) && !p.is_paid)
+          .reduce((sum: number, p: any) => sum + (p.price * p.quantity), 0);
+      } else if (partialAmount) {
+        calculatedAmount = parseFloat(partialAmount);
+      }
+
+      if (calculatedAmount <= 0) {
+        Alert.alert('Error', 'Monto inválido');
+        return;
+      }
+
+      // Marcar productos como pagados
+      const updatedProducts = selectedOrder.products.map((p: any) => ({
+        ...p,
+        is_paid: selectedProductsForPayment.includes(p.product_id) ? true : p.is_paid,
+      }));
+
+      // Calcular nuevo paid_amount y pending_amount
+      const newPaidAmount = (selectedOrder.paid_amount || 0) + calculatedAmount;
+      const newPendingAmount = selectedOrder.total - newPaidAmount;
+
+      // Agregar a partial_payments
+      const partialPayments = selectedOrder.partial_payments || [];
+      partialPayments.push({
+        amount: calculatedAmount,
+        payment_method: partialPaymentMethod,
         paid_products: selectedProductsForPayment,
+        timestamp: new Date().toISOString(),
         note: '',
       });
+
+      const updatedOrder = {
+        table_number: selectedOrder.table_number,
+        zone: selectedOrder.zone || 'terraza_exterior',
+        waiter_role: selectedOrder.waiter_role,
+        products: updatedProducts,
+        total: selectedOrder.total,
+        paid_amount: newPaidAmount,
+        pending_amount: newPendingAmount,
+        status: selectedOrder.status,
+        payment_method: partialPaymentMethod,
+        partial_payments: partialPayments,
+        special_note: selectedOrder.special_note || null,
+      };
+
+      await updateOrder(selectedOrder._id, updatedOrder);
       await refreshData();
       setPartialPaymentModalVisible(false);
       setSelectedOrder(null);
