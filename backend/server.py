@@ -836,7 +836,7 @@ async def seed_data():
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.post("/seed-data")
-async def seed_data():
+async def seed_simple_data():
     """Seed initial data (products)"""
     try:
         # Verificar si ya hay productos
