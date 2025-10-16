@@ -165,20 +165,20 @@ backend:
           agent: "testing"
           comment: "✅ PASSED - GET /api/weekly-stats funcionando perfectamente. Retorna todos los campos requeridos: period_start, period_end, total_sales, cash_sales, card_sales, mixed_sales, total_orders, zone_breakdown, daily_breakdown. Rango de fechas correcto (7 días). Zone_breakdown con estructura correcta para las 3 zonas. Daily_breakdown con fechas en formato YYYY-MM-DD y datos sales/orders por día. Probado con 12 pedidos entregados, total_sales: 747.0€."
 
-  - task: "Auto-delete Daily Closures >7 días"
+  - task: "Daily Closure Reset con closed_date"
     implemented: true
-    working: true
+    working: "NA"
     file: "server.py"
     stuck_count: 0
-    priority: "medium"
-    needs_retesting: false
+    priority: "high"
+    needs_retesting: true
     status_history:
+        - working: false
+          agent: "user"
+          comment: "Usuario reportó que cerrar día no resetea ventas a cero, permitiendo cierres duplicados"
         - working: "NA"
           agent: "main"
-          comment: "Agregada lógica automática para eliminar cierres diarios con más de 7 días de antigüedad al crear un nuevo cierre."
-        - working: true
-          agent: "testing"
-          comment: "✅ PASSED - POST /api/daily-closures funcionando correctamente con auto-eliminación. Creación de cierres exitosa con generación de ID. Lógica de auto-eliminación de cierres >7 días implementada y funcionando. Probado creando cierre antiguo (8 días) y nuevo cierre que activa la eliminación automática. Estructura de zone_breakdown correcta en respuesta."
+          comment: "FIXES APLICADOS: 1) Agregado campo closed_date al modelo Order, 2) Modificado daily-stats para filtrar pedidos ya cerrados (closed_date IS NULL), 3) Modificado create_daily_closure para: a) Verificar si ya existe cierre para hoy (error 400), b) Marcar todos pedidos entregados del día con closed_date, c) Emitir evento daily_closure_created vía WebSocket. Ahora cerrar día marca pedidos como cerrados y stats solo muestra pedidos no cerrados."
           
   - task: "API REST - Configuración OneSignal"
     implemented: true
