@@ -28,6 +28,7 @@ export default function OrdersScreen() {
   const [partialPaymentModalVisible, setPartialPaymentModalVisible] = useState(false);
   const [partialAmount, setPartialAmount] = useState('');
   const [selectedProductsForPayment, setSelectedProductsForPayment] = useState<string[]>([]);
+  const [partialPaymentMethod, setPartialPaymentMethod] = useState('efectivo');
 
   const zones = [
     { value: 'all', label: 'Todas' },
