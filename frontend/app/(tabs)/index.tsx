@@ -628,7 +628,7 @@ export default function OrdersScreen() {
             onChangeText={setPartialAmount}
             keyboardType="decimal-pad"
             returnKeyType="done"
-            onSubmitEditing={() => {}}
+            onSubmitEditing={Keyboard.dismiss}
           />
           <View style={styles.smallModalActions}>
             <TouchableOpacity
