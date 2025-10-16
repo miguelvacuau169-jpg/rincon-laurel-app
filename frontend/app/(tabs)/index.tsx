@@ -1104,4 +1104,30 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.white,
   },
+  paymentMethodButtons: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 16,
+  },
+  paymentMethodButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.lightGray,
+    borderRadius: 8,
+    padding: 12,
+    gap: 6,
+  },
+  paymentMethodButtonActive: {
+    backgroundColor: Colors.secondary,
+  },
+  paymentMethodText: {
+    fontSize: 13,
+    color: Colors.text,
+    fontWeight: '500',
+  },
+  paymentMethodTextActive: {
+    color: Colors.white,
+  },
 });
