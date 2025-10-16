@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Backend API Testing for El Rincón del Laurel
-Tests all REST API endpoints and business logic
+Backend API Testing for El Rincón del Laurel Restaurant App
+Testing specific endpoints: daily-stats, weekly-stats, daily-closures
+Focus on NEW/UPDATED endpoints as requested
 """
 
 import requests
