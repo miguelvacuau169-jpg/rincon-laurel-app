@@ -20,7 +20,7 @@ export default function SplashScreen() {
     }, 2500);
 
     return () => clearTimeout(timer);
-  }, [role]);
+  }, [role, router]);
 
   return (
     <View style={styles.container}>
