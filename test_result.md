@@ -256,6 +256,36 @@ backend:
           comment: "✅ PASSED - Sistema de notificaciones placeholder funcionando. Función send_notification() implementada correctamente, emite eventos Socket.IO. Integración OneSignal API pendiente de credenciales reales del usuario (comportamiento esperado)."
 
 frontend:
+  - task: "Category Icons Visibility Fix"
+    implemented: true
+    working: "NA"
+    file: "app/(tabs)/products.tsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "Usuario reportó que los íconos de categoría no se visualizan correctamente al agregar producto"
+        - working: "NA"
+          agent: "main"
+          comment: "FIX APLICADO: Agregado flexWrap: 'wrap' a categoryButtons style para que los íconos se ajusten correctamente cuando hay muchas categorías"
+
+  - task: "WebSocket Real-time Updates & Performance"
+    implemented: true
+    working: "NA"
+    file: "context/AppContext.tsx, services/api.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "Usuario reportó app lenta en cambios de estado y pedidos. Notificaciones no actualizan en tiempo real para todos usuarios"
+        - working: "NA"
+          agent: "main"
+          comment: "MEJORAS APLICADAS: 1) Agregados listeners faltantes para category_created, category_updated, category_deleted, daily_closure_created en api.ts, 2) Agregado callback onDailyClosureCreated en AppContext para refrescar datos automáticamente, 3) WebSocket ya emite todos eventos correctamente desde backend"
+
   - task: "Partial Payment Flow con Payment Method"
     implemented: true
     working: "NA"
