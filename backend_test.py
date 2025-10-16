@@ -445,6 +445,12 @@ class DailyClosureTestSuite:
         print("🧪 INICIANDO TESTING CRÍTICO: Daily Closure con Reset de Ventas")
         print("=" * 70)
         
+        # Check for existing closures first
+        if not self.cleanup_existing_closures():
+            print("\n❌ CRITICAL BUG DETECTED - Daily closure functionality is broken!")
+            print("   Closures exist but orders are not marked as closed")
+            return False
+        
         # Setup
         if not self.setup_test_data():
             print("\n❌ SETUP FAILED - Cannot continue with tests")
