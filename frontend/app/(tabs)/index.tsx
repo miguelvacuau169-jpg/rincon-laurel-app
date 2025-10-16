@@ -10,6 +10,9 @@ import {
   ScrollView,
   Alert,
   TextInput,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { useApp } from '../../context/AppContext';
 import { Colors, StatusColors } from '../../constants/Colors';
