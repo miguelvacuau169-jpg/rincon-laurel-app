@@ -247,6 +247,33 @@ backend:
           comment: "✅ PASSED - Sistema de notificaciones placeholder funcionando. Función send_notification() implementada correctamente, emite eventos Socket.IO. Integración OneSignal API pendiente de credenciales reales del usuario (comportamiento esperado)."
 
 frontend:
+  - task: "Partial Payment Flow con Payment Method"
+    implemented: true
+    working: "NA"
+    file: "app/(tabs)/index.tsx"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "Usuario reportó app freezing durante partial payment. Falta selector de método de pago."
+        - working: "NA"
+          agent: "main"
+          comment: "FIXES APLICADOS: 1) Eliminado duplicate state declaration de partialPaymentMethod, 2) Agregados imports de Keyboard, KeyboardAvoidingView, Platform, 3) Agregado selector de método de pago en modal (efectivo/tarjeta/ambos), 4) Implementado Keyboard.dismiss en onSubmitEditing, 5) Agregados estilos faltantes para paymentMethodButtons."
+
+  - task: "Daily Closure con Zone Breakdown y PDF"
+    implemented: true
+    working: "NA"
+    file: "app/(tabs)/daily-closure.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "NUEVAS FUNCIONALIDADES: 1) Instalado expo-print y expo-sharing, 2) Agregada visualización de zone_breakdown en stats diarios, 3) Implementado generateDailyPDF con logo y colores corporativos, 4) Implementado generateWeeklyPDF con datos de 7 días, 5) Agregados botones PDF Diario y PDF Semanal, 6) PDFs incluyen: fecha, ventas por método de pago, desglose por zonas, total pedidos, promedios."
+
   - task: "Navegación y Routing (Expo Router)"
     implemented: true
     working: "NA"
