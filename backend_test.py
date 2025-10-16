@@ -20,14 +20,13 @@ class BackendTester:
         self.session = requests.Session()
         self.session.timeout = TIMEOUT
         self.test_results = {
-            "products": {"passed": 0, "failed": 0, "errors": []},
-            "orders": {"passed": 0, "failed": 0, "errors": []},
-            "settings": {"passed": 0, "failed": 0, "errors": []},
-            "seed": {"passed": 0, "failed": 0, "errors": []},
-            "business_logic": {"passed": 0, "failed": 0, "errors": []}
+            "daily_stats": {"passed": 0, "failed": 0, "errors": []},
+            "weekly_stats": {"passed": 0, "failed": 0, "errors": []},
+            "daily_closures": {"passed": 0, "failed": 0, "errors": []},
+            "test_data": {"passed": 0, "failed": 0, "errors": []}
         }
-        self.created_products = []
         self.created_orders = []
+        self.created_closures = []
         
     def log_result(self, category: str, test_name: str, success: bool, error: str = None):
         """Log test result"""
