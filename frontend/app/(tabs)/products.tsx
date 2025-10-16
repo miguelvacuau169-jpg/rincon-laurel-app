@@ -463,6 +463,7 @@ const styles = StyleSheet.create({
   },
   categoryButtons: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 8,
   },
   categoryButton: {
