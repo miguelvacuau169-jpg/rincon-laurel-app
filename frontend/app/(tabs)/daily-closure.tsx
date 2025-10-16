@@ -468,6 +468,24 @@ export default function DailyClosureScreen() {
                 </View>
               </View>
 
+              {stats.zone_breakdown && Object.keys(stats.zone_breakdown).length > 0 && (
+                <>
+                  <View style={styles.divider} />
+                  <View style={styles.zoneSection}>
+                    <Text style={styles.zoneSectionTitle}>Desglose por Zonas</Text>
+                    {Object.entries(stats.zone_breakdown).map(([zone, data]: [string, any]) => (
+                      <View key={zone} style={styles.zoneRow}>
+                        <Text style={styles.zoneLabel}>{ZONE_LABELS[zone] || zone}</Text>
+                        <View style={styles.zoneData}>
+                          <Text style={styles.zoneValue}>€{data.sales.toFixed(2)}</Text>
+                          <Text style={styles.zoneOrders}>{data.orders} pedidos</Text>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                </>
+              )}
+
               <View style={styles.divider} />
 
               <View style={styles.ordersSection}>
