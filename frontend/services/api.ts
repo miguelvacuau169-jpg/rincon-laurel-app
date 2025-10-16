@@ -198,6 +198,11 @@ export const apiExtended = {
     return response.json();
   },
 
+  getWeeklyStats: async () => {
+    const response = await fetch(`${API_URL}/weekly-stats`);
+    return response.json();
+  },
+
   // Partial Payments
   addPartialPayment: async (orderId: string, payment: any) => {
     const response = await fetch(`${API_URL}/orders/${orderId}/partial-payment`, {
