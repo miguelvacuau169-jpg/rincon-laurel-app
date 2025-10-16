@@ -14,12 +14,22 @@ import { Ionicons } from '@expo/vector-icons';
 import { api } from '../../services/api';
 import { useApp } from '../../context/AppContext';
 import { format } from 'date-fns';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
+import { Asset } from 'expo-asset';
+
+const ZONE_LABELS: { [key: string]: string } = {
+  terraza_exterior: 'Terraza Exterior',
+  salon_interior: 'Salón Interior',
+  terraza_interior: 'Terraza Interior',
+};
 
 export default function DailyClosureScreen() {
   const { role } = useApp();
   const [stats, setStats] = useState<any>(null);
   const [closures, setClosures] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [generatingPDF, setGeneratingPDF] = useState(false);
 
   useEffect(() => {
     loadData();
