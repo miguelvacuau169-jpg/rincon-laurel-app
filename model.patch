@@ -1,397 +1,523 @@
+diff --git a/debug_closure.py b/debug_closure.py
+new file mode 100644
+index 0000000..e4885ee
+--- /dev/null
++++ b/debug_closure.py
+@@ -0,0 +1,75 @@
++#!/usr/bin/env python3
++"""
++Debug script to test the daily closure MongoDB update
++"""
++
++import requests
++import json
++from datetime import datetime
++
++BACKEND_URL = "https://resto-manager-100.preview.emergentagent.com/api"
++
++def debug_closure_issue():
++    print("🔍 DEBUGGING DAILY CLOSURE ISSUE")
++    print("=" * 50)
++    
++    # 1. Check current orders
++    print("\n1. Checking current orders...")
++    response = requests.get(f"{BACKEND_URL}/orders")
++    orders = response.json()
++    
++    delivered_today = []
++    today = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
++    
++    for order in orders:
++        if order.get('status') == 'entregado':
++            created_at = datetime.fromisoformat(order['created_at'].replace('Z', '+00:00'))
++            if created_at >= today:
++                delivered_today.append(order)
++    
++    print(f"   Delivered orders today: {len(delivered_today)}")
++    if delivered_today:
++        print(f"   Sample order ID: {delivered_today[0]['_id']}")
++        print(f"   Sample created_at: {delivered_today[0]['created_at']}")
++        print(f"   Sample closed_date: {delivered_today[0].get('closed_date', 'MISSING')}")
++    
++    # 2. Check current daily stats
++    print("\n2. Checking daily stats...")
++    response = requests.get(f"{BACKEND_URL}/daily-stats")
++    stats = response.json()
++    print(f"   Total sales: {stats['total_sales']}€")
++    print(f"   Total orders: {stats['total_orders']}")
++    
++    # 3. Check existing closures
++    print("\n3. Checking existing closures...")
++    response = requests.get(f"{BACKEND_URL}/daily-closures")
++    closures = response.json()
++    
++    today_closures = []
++    for closure in closures:
++        closure_date = datetime.fromisoformat(closure['date'].replace('Z', '+00:00'))
++        if closure_date >= today:
++            today_closures.append(closure)
++    
++    print(f"   Closures today: {len(today_closures)}")
++    if today_closures:
++        print(f"   Latest closure ID: {today_closures[0]['_id']}")
++        print(f"   Latest closure sales: {today_closures[0]['total_sales']}€")
++    
++    # 4. Analysis
++    print("\n4. ANALYSIS:")
++    if len(today_closures) > 0 and stats['total_orders'] > 0:
++        print("   ❌ BUG CONFIRMED: Closures exist but orders not marked as closed")
++        print("   📋 ISSUE: MongoDB update_many query is not working")
++        print("   🔧 POSSIBLE CAUSES:")
++        print("      - Date format mismatch in MongoDB query")
++        print("      - Field name mismatch (closed_date vs closedDate)")
++        print("      - MongoDB connection issue")
++        print("      - Query filter not matching any documents")
++    elif len(today_closures) == 0:
++        print("   ✅ No closures today - ready for testing")
++    else:
++        print("   ✅ Closures working correctly")
++
++if __name__ == "__main__":
++    debug_closure_issue()
+\ No newline at end of file
 diff --git a/model.patch b/model.patch
-index a8d03fc..e69de29 100644
+index a4cb76c..e69de29 100644
 --- a/model.patch
 +++ b/model.patch
-@@ -1,359 +0,0 @@
+@@ -1,397 +0,0 @@
 -diff --git a/model.patch b/model.patch
--index 9e7cbf2..e69de29 100644
+-index a8d03fc..e69de29 100644
 ---- a/model.patch
 -+++ b/model.patch
--@@ -1,275 +0,0 @@
---diff --git a/backend/server.py b/backend/server.py
---index febf4c5..db97ca1 100644
------ a/backend/server.py
---+++ b/backend/server.py
---@@ -100,18 +100,18 @@ class PartialPayment(BaseModel):
--- class Order(BaseModel):
---     id: Optional[str] = Field(alias="_id", default=None)
---     table_number: int
----    zone: str  # terraza_exterior, salon_interior, terraza_interior
---+    zone: Optional[str] = "terraza_exterior"  # terraza_exterior, salon_interior, terraza_interior
---     waiter_role: str  # barra, camarero_1, camarero_2, administrador
---     products: List[OrderProduct]
---     total: float
----    paid_amount: float = 0.0
----    pending_amount: float = 0.0
---+    paid_amount: Optional[float] = 0.0
---+    pending_amount: Optional[float] = 0.0
---     status: str = "pendiente"
---     payment_method: Optional[str] = None  # efectivo, tarjeta, ambos
----    partial_payments: List[PartialPayment] = []
---+    partial_payments: Optional[List[PartialPayment]] = []
---     special_note: Optional[str] = None
----    created_at: datetime = Field(default_factory=datetime.utcnow)
----    updated_at: datetime = Field(default_factory=datetime.utcnow)
---+    created_at: Optional[datetime] = Field(default_factory=datetime.utcnow)
---+    updated_at: Optional[datetime] = Field(default_factory=datetime.utcnow)
---     unified_with: Optional[List[str]] = []
--- 
---     class Config:
+-@@ -1,359 +0,0 @@
 --diff --git a/model.patch b/model.patch
---index 1fd943f..e69de29 100644
+--index 9e7cbf2..e69de29 100644
 ----- a/model.patch
 --+++ b/model.patch
---@@ -1,241 +0,0 @@
----diff --git a/frontend/app/(tabs)/index.tsx b/frontend/app/(tabs)/index.tsx
----index cb8d3ff..01e72e3 100644
------- a/frontend/app/(tabs)/index.tsx
----+++ b/frontend/app/(tabs)/index.tsx
----@@ -392,7 +392,7 @@ export default function OrdersScreen() {
----                 )}
----               </View>
+--@@ -1,275 +0,0 @@
+---diff --git a/backend/server.py b/backend/server.py
+---index febf4c5..db97ca1 100644
+------ a/backend/server.py
+---+++ b/backend/server.py
+---@@ -100,18 +100,18 @@ class PartialPayment(BaseModel):
+--- class Order(BaseModel):
+---     id: Optional[str] = Field(alias="_id", default=None)
+---     table_number: int
+----    zone: str  # terraza_exterior, salon_interior, terraza_interior
+---+    zone: Optional[str] = "terraza_exterior"  # terraza_exterior, salon_interior, terraza_interior
+---     waiter_role: str  # barra, camarero_1, camarero_2, administrador
+---     products: List[OrderProduct]
+---     total: float
+----    paid_amount: float = 0.0
+----    pending_amount: float = 0.0
+---+    paid_amount: Optional[float] = 0.0
+---+    pending_amount: Optional[float] = 0.0
+---     status: str = "pendiente"
+---     payment_method: Optional[str] = None  # efectivo, tarjeta, ambos
+----    partial_payments: List[PartialPayment] = []
+---+    partial_payments: Optional[List[PartialPayment]] = []
+---     special_note: Optional[str] = None
+----    created_at: datetime = Field(default_factory=datetime.utcnow)
+----    updated_at: datetime = Field(default_factory=datetime.utcnow)
+---+    created_at: Optional[datetime] = Field(default_factory=datetime.utcnow)
+---+    updated_at: Optional[datetime] = Field(default_factory=datetime.utcnow)
+---     unified_with: Optional[List[str]] = []
 --- 
-----              {selectedOrder.pending_amount > 0 && (
----+              {(selectedOrder.pending_amount || 0) > 0 && (
----                 <TouchableOpacity
----                   style={styles.partialPaymentButton}
----                   onPress={openPartialPaymentModal}
+---     class Config:
 ---diff --git a/model.patch b/model.patch
----index 1932118..e69de29 100644
+---index 1fd943f..e69de29 100644
 ------ a/model.patch
 ---+++ b/model.patch
----@@ -1,223 +0,0 @@
+---@@ -1,241 +0,0 @@
+----diff --git a/frontend/app/(tabs)/index.tsx b/frontend/app/(tabs)/index.tsx
+----index cb8d3ff..01e72e3 100644
+------- a/frontend/app/(tabs)/index.tsx
+----+++ b/frontend/app/(tabs)/index.tsx
+----@@ -392,7 +392,7 @@ export default function OrdersScreen() {
+----                 )}
+----               </View>
+---- 
+-----              {selectedOrder.pending_amount > 0 && (
+----+              {(selectedOrder.pending_amount || 0) > 0 && (
+----                 <TouchableOpacity
+----                   style={styles.partialPaymentButton}
+----                   onPress={openPartialPaymentModal}
 ----diff --git a/model.patch b/model.patch
-----index b7db0dc..e69de29 100644
+----index 1932118..e69de29 100644
 ------- a/model.patch
 ----+++ b/model.patch
-----@@ -1,218 +0,0 @@
------diff --git a/frontend/app/(tabs)/index.tsx b/frontend/app/(tabs)/index.tsx
------index c0b8aad..cb8d3ff 100644
--------- a/frontend/app/(tabs)/index.tsx
------+++ b/frontend/app/(tabs)/index.tsx
------@@ -38,7 +38,7 @@ export default function OrdersScreen() {
------ 
------   const filteredOrders = orders.filter((order) => {
------     if (filter !== 'all' && order.status !== filter) return false;
-------    if (zoneFilter !== 'all' && order.zone !== zoneFilter) return false;
------+    if (zoneFilter !== 'all' && (order.zone || 'terraza_exterior') !== zoneFilter) return false;
------     return true;
------   });
------ 
------@@ -147,7 +147,7 @@ export default function OrdersScreen() {
------     const orderDate = new Date(item.created_at);
------     const timeStr = format(orderDate, 'HH:mm');
------ 
-------    const zoneLabel = zones.find((z) => z.value === item.zone)?.label || item.zone;
------+    const zoneLabel = zones.find((z) => z.value === (item.zone || 'terraza_exterior'))?.label || (item.zone || 'Terraza Ext.');
------ 
------     return (
------       <TouchableOpacity
------@@ -197,8 +197,8 @@ export default function OrdersScreen() {
------           </View>
------           <View style={styles.orderBodyRight}>
------             <Text style={styles.totalText}>€{item.total.toFixed(2)}</Text>
-------            {item.pending_amount > 0 && (
-------              <Text style={styles.pendingText}>Pendiente: €{item.pending_amount.toFixed(2)}</Text>
------+            {(item.pending_amount || 0) > 0 && (
------+              <Text style={styles.pendingText}>Pendiente: €{(item.pending_amount || 0).toFixed(2)}</Text>
------             )}
------           </View>
------         </View>
------@@ -378,16 +378,16 @@ export default function OrdersScreen() {
------                   <Text style={styles.totalLabel}>Total</Text>
------                   <Text style={styles.totalAmount}>€{selectedOrder.total.toFixed(2)}</Text>
------                 </View>
-------                {selectedOrder.paid_amount > 0 && (
------+                {(selectedOrder.paid_amount || 0) > 0 && (
------                   <View style={styles.paymentRow}>
------                     <Text style={styles.paymentLabel}>Pagado</Text>
-------                    <Text style={styles.paidAmount}>€{selectedOrder.paid_amount.toFixed(2)}</Text>
------+                    <Text style={styles.paidAmount}>€{(selectedOrder.paid_amount || 0).toFixed(2)}</Text>
------                   </View>
------                 )}
-------                {selectedOrder.pending_amount > 0 && (
------+                {(selectedOrder.pending_amount || 0) > 0 && (
------                   <View style={styles.paymentRow}>
------                     <Text style={styles.paymentLabel}>Pendiente</Text>
-------                    <Text style={styles.pendingAmount}>€{selectedOrder.pending_amount.toFixed(2)}</Text>
------+                    <Text style={styles.pendingAmount">€{(selectedOrder.pending_amount || 0).toFixed(2)}</Text>
------                   </View>
------                 )}
------               </View>
------@@ -470,7 +470,7 @@ export default function OrdersScreen() {
------         <View style={styles.smallModalContent}>
------           <Text style={styles.smallModalTitle}>Cobro Parcial</Text>
------           <Text style={styles.smallModalSubtitle}>
-------            Pendiente: €{selectedOrder?.pending_amount.toFixed(2)}
------+            Pendiente: €{(selectedOrder?.pending_amount || selectedOrder?.total || 0).toFixed(2)}
------           </Text>
------           
------           <Text style={styles.selectProductsLabel}>Selecciona productos pagados:</Text>
+----@@ -1,223 +0,0 @@
 -----diff --git a/model.patch b/model.patch
------index 88535ee..e69de29 100644
+-----index b7db0dc..e69de29 100644
 -------- a/model.patch
 -----+++ b/model.patch
------@@ -1,150 +0,0 @@
-------diff --git a/test_result.md b/test_result.md
-------index 9a38ba2..aba25ba 100644
---------- a/test_result.md
-------+++ b/test_result.md
-------@@ -107,51 +107,63 @@ user_problem_statement: "Aplicación móvil interna para restaurante El Rincón
------- backend:
-------   - task: "API REST - Productos (CRUD)"
-------     implemented: true
--------    working: "NA"
-------+    working: true
-------     file: "server.py"
-------     stuck_count: 0
-------     priority: "high"
--------    needs_retesting: true
-------+    needs_retesting: false
-------     status_history:
-------         - working: "NA"
-------           agent: "main"
-------           comment: "Implementado endpoints GET, POST, PUT, DELETE para productos. Endpoints: /api/products, /api/products/:id"
-------+        - working: true
-------+          agent: "testing"
-------+          comment: "✅ PASSED - Todos los endpoints CRUD funcionando correctamente. GET /products retorna 14 productos existentes, POST crea productos con serialización correcta de datetime, PUT actualiza productos, DELETE elimina productos. ObjectId se convierte correctamente a string."
-------           
-------   - task: "API REST - Pedidos (CRUD)"
-------     implemented: true
--------    working: "NA"
-------+    working: true
-------     file: "server.py"
-------     stuck_count: 0
-------     priority: "high"
--------    needs_retesting: true
-------+    needs_retesting: false
-------     status_history:
-------         - working: "NA"
-------           agent: "main"
-------           comment: "Implementado endpoints GET, POST, PUT, DELETE para pedidos. Endpoints: /api/orders, /api/orders/:id. Incluye lógica de unificación de pedidos < 3 minutos"
-------+        - working: true
-------+          agent: "testing"
-------+          comment: "✅ PASSED - Todos los endpoints CRUD funcionando correctamente. GET /orders retorna pedidos existentes, POST crea pedidos con cálculo correcto de totales, GET /:id obtiene pedido específico, PUT actualiza estado, DELETE elimina pedidos. Serialización de datetime correcta (created_at, updated_at)."
-------           
-------   - task: "API REST - Configuración OneSignal"
-------     implemented: true
--------    working: "NA"
-------+    working: true
-------     file: "server.py"
-------     stuck_count: 0
-------     priority: "medium"
--------    needs_retesting: true
-------+    needs_retesting: false
-------     status_history:
-------         - working: "NA"
-------           agent: "main"
-------           comment: "Implementado endpoints GET y PUT para /api/settings. Guarda App ID y API Key de OneSignal en MongoDB"
-------+        - working: true
-------+          agent: "testing"
-------+          comment: "✅ PASSED - Endpoints de configuración funcionando correctamente. GET /settings retorna estructura correcta con onesignal_app_id, onesignal_api_key y updated_at. PUT /settings actualiza configuración correctamente con serialización de datetime."
-------           
-------   - task: "API REST - Seed Data"
-------     implemented: true
--------    working: "NA"
-------+    working: true
-------     file: "server.py"
-------     stuck_count: 0
-------     priority: "medium"
--------    needs_retesting: true
-------+    needs_retesting: false
-------     status_history:
-------         - working: "NA"
-------           agent: "main"
-------           comment: "Endpoint POST /api/seed para cargar 14 productos de ejemplo (comidas, bebidas, postres españoles típicos)"
-------+        - working: true
-------+          agent: "testing"
-------+          comment: "✅ PASSED - Endpoint POST /seed funcionando correctamente. Prevención de duplicados activa - retorna 'Data already seeded' cuando ya existen productos. Los 14 productos de ejemplo ya están cargados en la base de datos."
-------           
-------   - task: "WebSocket - Tiempo Real"
-------     implemented: true
-------@@ -159,35 +171,44 @@ backend:
-------     file: "server.py"
-------     stuck_count: 0
-------     priority: "high"
--------    needs_retesting: true
-------+    needs_retesting: false
-------     status_history:
-------         - working: "NA"
-------           agent: "main"
-------           comment: "Socket.IO configurado con eventos: connect, disconnect, set_role, sync_request, order_created/updated/deleted, product_created/updated/deleted, notification"
-------+        - working: "NA"
-------+          agent: "testing"
-------+          comment: "⚠️ SKIPPED - WebSocket testing no realizado según instrucciones. Solo se probaron endpoints REST. Socket.IO configurado pero requiere testing específico de eventos en tiempo real."
-------           
-------   - task: "Lógica de Unificación de Pedidos"
-------     implemented: true
--------    working: "NA"
-------+    working: true
-------     file: "server.py"
-------     stuck_count: 0
-------     priority: "medium"
--------    needs_retesting: true
-------+    needs_retesting: false
-------     status_history:
-------         - working: "NA"
-------           agent: "main"
-------           comment: "Función find_similar_orders() detecta pedidos creados en < 3 minutos con productos iguales y los marca como unified_with"
-------+        - working: true
-------+          agent: "testing"
-------+          comment: "✅ PASSED - Lógica de unificación funcionando correctamente. Creados 2 pedidos con productos similares en < 3 minutos, el segundo pedido tiene campo unified_with poblado con ID del primer pedido. Algoritmo detecta correctamente productos overlapping."
-------           
-------   - task: "Notificaciones (OneSignal placeholder)"
-------     implemented: true
--------    working: "NA"
-------+    working: true
-------     file: "server.py"
-------     stuck_count: 0
-------     priority: "low"
--------    needs_retesting: true
-------+    needs_retesting: false
-------     status_history:
-------         - working: "NA"
-------           agent: "main"
-------           comment: "Función send_notification() emite evento de Socket.IO cuando pedido pasa a 'listo'. Integración OneSignal API REST pendiente de credenciales del usuario"
-------+        - working: true
-------+          agent: "testing"
-------+          comment: "✅ PASSED - Sistema de notificaciones placeholder funcionando. Función send_notification() implementada correctamente, emite eventos Socket.IO. Integración OneSignal API pendiente de credenciales reales del usuario (comportamiento esperado)."
+-----@@ -1,218 +0,0 @@
+------diff --git a/frontend/app/(tabs)/index.tsx b/frontend/app/(tabs)/index.tsx
+------index c0b8aad..cb8d3ff 100644
+--------- a/frontend/app/(tabs)/index.tsx
+------+++ b/frontend/app/(tabs)/index.tsx
+------@@ -38,7 +38,7 @@ export default function OrdersScreen() {
 ------ 
------- frontend:
-------   - task: "Navegación y Routing (Expo Router)"
-------@@ -305,17 +326,13 @@ metadata:
-------   run_ui: false
+------   const filteredOrders = orders.filter((order) => {
+------     if (filter !== 'all' && order.status !== filter) return false;
+-------    if (zoneFilter !== 'all' && order.zone !== zoneFilter) return false;
+------+    if (zoneFilter !== 'all' && (order.zone || 'terraza_exterior') !== zoneFilter) return false;
+------     return true;
+------   });
 ------ 
------- test_plan:
--------  current_focus:
--------    - "API REST - Productos (CRUD)"
--------    - "API REST - Pedidos (CRUD)"
--------    - "WebSocket - Tiempo Real"
--------    - "API REST - Configuración OneSignal"
--------    - "API REST - Seed Data"
--------    - "Lógica de Unificación de Pedidos"
-------+  current_focus: []
-------   stuck_tasks: []
-------   test_all: false
-------   test_priority: "high_first"
+------@@ -147,7 +147,7 @@ export default function OrdersScreen() {
+------     const orderDate = new Date(item.created_at);
+------     const timeStr = format(orderDate, 'HH:mm');
 ------ 
------- agent_communication:
-------     - agent: "main"
--------      message: "Backend completamente implementado con FastAPI + Socket.IO + MongoDB. Incluye todos los endpoints REST, WebSocket para tiempo real, lógica de unificación de pedidos, y notificaciones. Frontend completamente implementado con Expo Router, 4 pantallas principales, Context API, Socket.IO client, y almacenamiento offline. Los datos de ejemplo (14 productos) ya están cargados. Un pedido de prueba fue creado exitosamente. Necesito testing completo del backend: endpoints REST, Socket.IO, y lógica de negocio."
-------\ No newline at end of file
-------+      message: "Backend completamente implementado con FastAPI + Socket.IO + MongoDB. Incluye todos los endpoints REST, WebSocket para tiempo real, lógica de unificación de pedidos, y notificaciones. Frontend completamente implementado con Expo Router, 4 pantallas principales, Context API, Socket.IO client, y almacenamiento offline. Los datos de ejemplo (14 productos) ya están cargados. Un pedido de prueba fue creado exitosamente. Necesito testing completo del backend: endpoints REST, Socket.IO, y lógica de negocio."
-------+    - agent: "testing"
-------+      message: "✅ BACKEND TESTING COMPLETADO - Todos los endpoints REST funcionando perfectamente. Probados: Products CRUD (6/6 tests), Orders CRUD (6/6 tests), Settings API (4/4 tests), Seed Data (1/1 test), Business Logic (2/2 tests). Total: 19/19 tests PASSED. Base de datos con 14 productos de ejemplo ya cargados, 1 pedido existente. Lógica de unificación, serialización de datetime y ObjectId funcionando correctamente. WebSocket no probado según instrucciones. Backend listo para producción."
-------\ No newline at end of file
+-------    const zoneLabel = zones.find((z) => z.value === item.zone)?.label || item.zone;
+------+    const zoneLabel = zones.find((z) => z.value === (item.zone || 'terraza_exterior'))?.label || (item.zone || 'Terraza Ext.');
+------ 
+------     return (
+------       <TouchableOpacity
+------@@ -197,8 +197,8 @@ export default function OrdersScreen() {
+------           </View>
+------           <View style={styles.orderBodyRight}>
+------             <Text style={styles.totalText}>€{item.total.toFixed(2)}</Text>
+-------            {item.pending_amount > 0 && (
+-------              <Text style={styles.pendingText}>Pendiente: €{item.pending_amount.toFixed(2)}</Text>
+------+            {(item.pending_amount || 0) > 0 && (
+------+              <Text style={styles.pendingText}>Pendiente: €{(item.pending_amount || 0).toFixed(2)}</Text>
+------             )}
+------           </View>
+------         </View>
+------@@ -378,16 +378,16 @@ export default function OrdersScreen() {
+------                   <Text style={styles.totalLabel}>Total</Text>
+------                   <Text style={styles.totalAmount}>€{selectedOrder.total.toFixed(2)}</Text>
+------                 </View>
+-------                {selectedOrder.paid_amount > 0 && (
+------+                {(selectedOrder.paid_amount || 0) > 0 && (
+------                   <View style={styles.paymentRow}>
+------                     <Text style={styles.paymentLabel}>Pagado</Text>
+-------                    <Text style={styles.paidAmount}>€{selectedOrder.paid_amount.toFixed(2)}</Text>
+------+                    <Text style={styles.paidAmount}>€{(selectedOrder.paid_amount || 0).toFixed(2)}</Text>
+------                   </View>
+------                 )}
+-------                {selectedOrder.pending_amount > 0 && (
+------+                {(selectedOrder.pending_amount || 0) > 0 && (
+------                   <View style={styles.paymentRow}>
+------                     <Text style={styles.paymentLabel}>Pendiente</Text>
+-------                    <Text style={styles.pendingAmount}>€{selectedOrder.pending_amount.toFixed(2)}</Text>
+------+                    <Text style={styles.pendingAmount">€{(selectedOrder.pending_amount || 0).toFixed(2)}</Text>
+------                   </View>
+------                 )}
+------               </View>
+------@@ -470,7 +470,7 @@ export default function OrdersScreen() {
+------         <View style={styles.smallModalContent}>
+------           <Text style={styles.smallModalTitle}>Cobro Parcial</Text>
+------           <Text style={styles.smallModalSubtitle}>
+-------            Pendiente: €{selectedOrder?.pending_amount.toFixed(2)}
+------+            Pendiente: €{(selectedOrder?.pending_amount || selectedOrder?.total || 0).toFixed(2)}
+------           </Text>
+------           
+------           <Text style={styles.selectProductsLabel}>Selecciona productos pagados:</Text>
+------diff --git a/model.patch b/model.patch
+------index 88535ee..e69de29 100644
+--------- a/model.patch
+------+++ b/model.patch
+------@@ -1,150 +0,0 @@
+-------diff --git a/test_result.md b/test_result.md
+-------index 9a38ba2..aba25ba 100644
+---------- a/test_result.md
+-------+++ b/test_result.md
+-------@@ -107,51 +107,63 @@ user_problem_statement: "Aplicación móvil interna para restaurante El Rincón
+------- backend:
+-------   - task: "API REST - Productos (CRUD)"
+-------     implemented: true
+--------    working: "NA"
+-------+    working: true
+-------     file: "server.py"
+-------     stuck_count: 0
+-------     priority: "high"
+--------    needs_retesting: true
+-------+    needs_retesting: false
+-------     status_history:
+-------         - working: "NA"
+-------           agent: "main"
+-------           comment: "Implementado endpoints GET, POST, PUT, DELETE para productos. Endpoints: /api/products, /api/products/:id"
+-------+        - working: true
+-------+          agent: "testing"
+-------+          comment: "✅ PASSED - Todos los endpoints CRUD funcionando correctamente. GET /products retorna 14 productos existentes, POST crea productos con serialización correcta de datetime, PUT actualiza productos, DELETE elimina productos. ObjectId se convierte correctamente a string."
+-------           
+-------   - task: "API REST - Pedidos (CRUD)"
+-------     implemented: true
+--------    working: "NA"
+-------+    working: true
+-------     file: "server.py"
+-------     stuck_count: 0
+-------     priority: "high"
+--------    needs_retesting: true
+-------+    needs_retesting: false
+-------     status_history:
+-------         - working: "NA"
+-------           agent: "main"
+-------           comment: "Implementado endpoints GET, POST, PUT, DELETE para pedidos. Endpoints: /api/orders, /api/orders/:id. Incluye lógica de unificación de pedidos < 3 minutos"
+-------+        - working: true
+-------+          agent: "testing"
+-------+          comment: "✅ PASSED - Todos los endpoints CRUD funcionando correctamente. GET /orders retorna pedidos existentes, POST crea pedidos con cálculo correcto de totales, GET /:id obtiene pedido específico, PUT actualiza estado, DELETE elimina pedidos. Serialización de datetime correcta (created_at, updated_at)."
+-------           
+-------   - task: "API REST - Configuración OneSignal"
+-------     implemented: true
+--------    working: "NA"
+-------+    working: true
+-------     file: "server.py"
+-------     stuck_count: 0
+-------     priority: "medium"
+--------    needs_retesting: true
+-------+    needs_retesting: false
+-------     status_history:
+-------         - working: "NA"
+-------           agent: "main"
+-------           comment: "Implementado endpoints GET y PUT para /api/settings. Guarda App ID y API Key de OneSignal en MongoDB"
+-------+        - working: true
+-------+          agent: "testing"
+-------+          comment: "✅ PASSED - Endpoints de configuración funcionando correctamente. GET /settings retorna estructura correcta con onesignal_app_id, onesignal_api_key y updated_at. PUT /settings actualiza configuración correctamente con serialización de datetime."
+-------           
+-------   - task: "API REST - Seed Data"
+-------     implemented: true
+--------    working: "NA"
+-------+    working: true
+-------     file: "server.py"
+-------     stuck_count: 0
+-------     priority: "medium"
+--------    needs_retesting: true
+-------+    needs_retesting: false
+-------     status_history:
+-------         - working: "NA"
+-------           agent: "main"
+-------           comment: "Endpoint POST /api/seed para cargar 14 productos de ejemplo (comidas, bebidas, postres españoles típicos)"
+-------+        - working: true
+-------+          agent: "testing"
+-------+          comment: "✅ PASSED - Endpoint POST /seed funcionando correctamente. Prevención de duplicados activa - retorna 'Data already seeded' cuando ya existen productos. Los 14 productos de ejemplo ya están cargados en la base de datos."
+-------           
+-------   - task: "WebSocket - Tiempo Real"
+-------     implemented: true
+-------@@ -159,35 +171,44 @@ backend:
+-------     file: "server.py"
+-------     stuck_count: 0
+-------     priority: "high"
+--------    needs_retesting: true
+-------+    needs_retesting: false
+-------     status_history:
+-------         - working: "NA"
+-------           agent: "main"
+-------           comment: "Socket.IO configurado con eventos: connect, disconnect, set_role, sync_request, order_created/updated/deleted, product_created/updated/deleted, notification"
+-------+        - working: "NA"
+-------+          agent: "testing"
+-------+          comment: "⚠️ SKIPPED - WebSocket testing no realizado según instrucciones. Solo se probaron endpoints REST. Socket.IO configurado pero requiere testing específico de eventos en tiempo real."
+-------           
+-------   - task: "Lógica de Unificación de Pedidos"
+-------     implemented: true
+--------    working: "NA"
+-------+    working: true
+-------     file: "server.py"
+-------     stuck_count: 0
+-------     priority: "medium"
+--------    needs_retesting: true
+-------+    needs_retesting: false
+-------     status_history:
+-------         - working: "NA"
+-------           agent: "main"
+-------           comment: "Función find_similar_orders() detecta pedidos creados en < 3 minutos con productos iguales y los marca como unified_with"
+-------+        - working: true
+-------+          agent: "testing"
+-------+          comment: "✅ PASSED - Lógica de unificación funcionando correctamente. Creados 2 pedidos con productos similares en < 3 minutos, el segundo pedido tiene campo unified_with poblado con ID del primer pedido. Algoritmo detecta correctamente productos overlapping."
+-------           
+-------   - task: "Notificaciones (OneSignal placeholder)"
+-------     implemented: true
+--------    working: "NA"
+-------+    working: true
+-------     file: "server.py"
+-------     stuck_count: 0
+-------     priority: "low"
+--------    needs_retesting: true
+-------+    needs_retesting: false
+-------     status_history:
+-------         - working: "NA"
+-------           agent: "main"
+-------           comment: "Función send_notification() emite evento de Socket.IO cuando pedido pasa a 'listo'. Integración OneSignal API REST pendiente de credenciales del usuario"
+-------+        - working: true
+-------+          agent: "testing"
+-------+          comment: "✅ PASSED - Sistema de notificaciones placeholder funcionando. Función send_notification() implementada correctamente, emite eventos Socket.IO. Integración OneSignal API pendiente de credenciales reales del usuario (comportamiento esperado)."
+------- 
+------- frontend:
+-------   - task: "Navegación y Routing (Expo Router)"
+-------@@ -305,17 +326,13 @@ metadata:
+-------   run_ui: false
+------- 
+------- test_plan:
+--------  current_focus:
+--------    - "API REST - Productos (CRUD)"
+--------    - "API REST - Pedidos (CRUD)"
+--------    - "WebSocket - Tiempo Real"
+--------    - "API REST - Configuración OneSignal"
+--------    - "API REST - Seed Data"
+--------    - "Lógica de Unificación de Pedidos"
+-------+  current_focus: []
+-------   stuck_tasks: []
+-------   test_all: false
+-------   test_priority: "high_first"
+------- 
+------- agent_communication:
+-------     - agent: "main"
+--------      message: "Backend completamente implementado con FastAPI + Socket.IO + MongoDB. Incluye todos los endpoints REST, WebSocket para tiempo real, lógica de unificación de pedidos, y notificaciones. Frontend completamente implementado con Expo Router, 4 pantallas principales, Context API, Socket.IO client, y almacenamiento offline. Los datos de ejemplo (14 productos) ya están cargados. Un pedido de prueba fue creado exitosamente. Necesito testing completo del backend: endpoints REST, Socket.IO, y lógica de negocio."
+-------\ No newline at end of file
+-------+      message: "Backend completamente implementado con FastAPI + Socket.IO + MongoDB. Incluye todos los endpoints REST, WebSocket para tiempo real, lógica de unificación de pedidos, y notificaciones. Frontend completamente implementado con Expo Router, 4 pantallas principales, Context API, Socket.IO client, y almacenamiento offline. Los datos de ejemplo (14 productos) ya están cargados. Un pedido de prueba fue creado exitosamente. Necesito testing completo del backend: endpoints REST, Socket.IO, y lógica de negocio."
+-------+    - agent: "testing"
+-------+      message: "✅ BACKEND TESTING COMPLETADO - Todos los endpoints REST funcionando perfectamente. Probados: Products CRUD (6/6 tests), Orders CRUD (6/6 tests), Settings API (4/4 tests), Seed Data (1/1 test), Business Logic (2/2 tests). Total: 19/19 tests PASSED. Base de datos con 14 productos de ejemplo ya cargados, 1 pedido existente. Lógica de unificación, serialización de datetime y ObjectId funcionando correctamente. WebSocket no probado según instrucciones. Backend listo para producción."
+-------\ No newline at end of file
+--diff --git a/test_result.md b/test_result.md
+--index 477e714..1ef92b2 100644
+----- a/test_result.md
+--+++ b/test_result.md
+--@@ -137,39 +137,48 @@ backend:
+-- 
+--   - task: "API Daily Stats con Zona Breakdown"
+--     implemented: true
+---    working: "NA"
+--+    working: true
+--     file: "server.py"
+--     stuck_count: 0
+--     priority: "high"
+---    needs_retesting: true
+--+    needs_retesting: false
+--     status_history:
+--         - working: "NA"
+--           agent: "main"
+--           comment: "Actualizado endpoint /api/daily-stats para incluir desglose por zonas (terraza_exterior, salon_interior, terraza_interior). Retorna ventas y pedidos por zona."
+--+        - working: true
+--+          agent: "testing"
+--+          comment: "✅ PASSED - GET /api/daily-stats funcionando perfectamente. Retorna todos los campos requeridos: date, total_sales, cash_sales, card_sales, mixed_sales, total_orders, zone_breakdown. Estructura de zone_breakdown correcta con las 3 zonas esperadas (terraza_exterior, salon_interior, terraza_interior), cada una con campos sales y orders. Tipos de datos numéricos correctos. Probado con 5 pedidos entregados, total_sales: 251.0€."
+-- 
+--   - task: "API Weekly Stats"
+--     implemented: true
+---    working: "NA"
+--+    working: true
+--     file: "server.py"
+--     stuck_count: 0
+--     priority: "high"
+---    needs_retesting: true
+--+    needs_retesting: false
+--     status_history:
+--         - working: "NA"
+--           agent: "main"
+--           comment: "Nuevo endpoint /api/weekly-stats para obtener estadísticas de los últimos 7 días. Incluye ventas por zona, por método de pago, y desglose diario."
+--+        - working: true
+--+          agent: "testing"
+--+          comment: "✅ PASSED - GET /api/weekly-stats funcionando perfectamente. Retorna todos los campos requeridos: period_start, period_end, total_sales, cash_sales, card_sales, mixed_sales, total_orders, zone_breakdown, daily_breakdown. Rango de fechas correcto (7 días). Zone_breakdown con estructura correcta para las 3 zonas. Daily_breakdown con fechas en formato YYYY-MM-DD y datos sales/orders por día. Probado con 12 pedidos entregados, total_sales: 747.0€."
+-- 
+--   - task: "Auto-delete Daily Closures >7 días"
+--     implemented: true
+---    working: "NA"
+--+    working: true
+--     file: "server.py"
+--     stuck_count: 0
+--     priority: "medium"
+---    needs_retesting: true
+--+    needs_retesting: false
+--     status_history:
+--         - working: "NA"
+--           agent: "main"
+--           comment: "Agregada lógica automática para eliminar cierres diarios con más de 7 días de antigüedad al crear un nuevo cierre."
+--+        - working: true
+--+          agent: "testing"
+--+          comment: "✅ PASSED - POST /api/daily-closures funcionando correctamente con auto-eliminación. Creación de cierres exitosa con generación de ID. Lógica de auto-eliminación de cierres >7 días implementada y funcionando. Probado creando cierre antiguo (8 días) y nuevo cierre que activa la eliminación automática. Estructura de zone_breakdown correcta en respuesta."
+--           
+--   - task: "API REST - Configuración OneSignal"
+--     implemented: true
+--@@ -390,9 +399,6 @@ metadata:
+-- 
+-- test_plan:
+--   current_focus:
+---    - "API Daily Stats con Zona Breakdown"
+---    - "API Weekly Stats"
+---    - "Auto-delete Daily Closures >7 días"
+--     - "Partial Payment Flow con Payment Method"
+--     - "Daily Closure con Zone Breakdown y PDF"
+--   stuck_tasks: []
+--@@ -405,4 +411,6 @@ agent_communication:
+--     - agent: "testing"
+--       message: "✅ BACKEND TESTING COMPLETADO - Todos los endpoints REST funcionando perfectamente. Probados: Products CRUD (6/6 tests), Orders CRUD (6/6 tests), Settings API (4/4 tests), Seed Data (1/1 test), Business Logic (2/2 tests). Total: 19/19 tests PASSED. Base de datos con 14 productos de ejemplo ya cargados, 1 pedido existente. Lógica de unificación, serialización de datetime y ObjectId funcionando correctamente. WebSocket no probado según instrucciones. Backend listo para producción."
+--     - agent: "main"
+---      message: "ACTUALIZACIÓN IMPORTANTE - Implementadas las siguientes mejoras: 1) BACKEND: Agregado zone_breakdown a daily stats, nuevo endpoint weekly-stats, auto-eliminación de closures >7 días, 2) FRONTEND: Corregido app freezing en partial payments (eliminado duplicate state, agregados estilos faltantes), implementado keyboard dismissal, agregado selector de payment method en partial payment modal, 3) DAILY CLOSURE: Instalado expo-print/expo-sharing, implementada generación de PDFs diarios y semanales con logo y colores corporativos, agregada visualización de zone breakdown. NECESITO: Testing de nuevos endpoints backend (daily-stats con zones, weekly-stats) y testing completo de partial payments en frontend."
+--\ No newline at end of file
+--+      message: "ACTUALIZACIÓN IMPORTANTE - Implementadas las siguientes mejoras: 1) BACKEND: Agregado zone_breakdown a daily stats, nuevo endpoint weekly-stats, auto-eliminación de closures >7 días, 2) FRONTEND: Corregido app freezing en partial payments (eliminado duplicate state, agregados estilos faltantes), implementado keyboard dismissal, agregado selector de payment method en partial payment modal, 3) DAILY CLOSURE: Instalado expo-print/expo-sharing, implementada generación de PDFs diarios y semanales con logo y colores corporativos, agregada visualización de zone breakdown. NECESITO: Testing de nuevos endpoints backend (daily-stats con zones, weekly-stats) y testing completo de partial payments en frontend."
+--+    - agent: "testing"
+--+      message: "✅ NUEVOS ENDPOINTS BACKEND TESTING COMPLETADO - Probados los 3 endpoints específicos solicitados: 1) GET /api/daily-stats con zone_breakdown (12/12 tests PASSED) - Retorna correctamente ventas y pedidos por zona (terraza_exterior, salon_interior, terraza_interior), 2) GET /api/weekly-stats (17/17 tests PASSED) - Estadísticas de 7 días con zone_breakdown y daily_breakdown funcionando perfectamente, 3) POST /api/daily-closures auto-delete (4/4 tests PASSED) - Lógica de eliminación automática de cierres >7 días funcionando correctamente. Total: 34/34 tests PASSED. Base de datos con 12 pedidos entregados para testing. Todos los nuevos endpoints backend funcionando perfectamente y listos para producción."
+--\ No newline at end of file
 -diff --git a/test_result.md b/test_result.md
--index 477e714..1ef92b2 100644
+-index 1ef92b2..3f101b8 100644
 ---- a/test_result.md
 -+++ b/test_result.md
--@@ -137,39 +137,48 @@ backend:
+-@@ -165,20 +165,20 @@ backend:
+-           agent: "testing"
+-           comment: "✅ PASSED - GET /api/weekly-stats funcionando perfectamente. Retorna todos los campos requeridos: period_start, period_end, total_sales, cash_sales, card_sales, mixed_sales, total_orders, zone_breakdown, daily_breakdown. Rango de fechas correcto (7 días). Zone_breakdown con estructura correcta para las 3 zonas. Daily_breakdown con fechas en formato YYYY-MM-DD y datos sales/orders por día. Probado con 12 pedidos entregados, total_sales: 747.0€."
 - 
--   - task: "API Daily Stats con Zona Breakdown"
+--  - task: "Auto-delete Daily Closures >7 días"
+-+  - task: "Daily Closure Reset con closed_date"
 -     implemented: true
---    working: "NA"
--+    working: true
+--    working: true
+-+    working: "NA"
 -     file: "server.py"
 -     stuck_count: 0
--     priority: "high"
---    needs_retesting: true
--+    needs_retesting: false
+--    priority: "medium"
+--    needs_retesting: false
+-+    priority: "high"
+-+    needs_retesting: true
 -     status_history:
+-+        - working: false
+-+          agent: "user"
+-+          comment: "Usuario reportó que cerrar día no resetea ventas a cero, permitiendo cierres duplicados"
 -         - working: "NA"
 -           agent: "main"
--           comment: "Actualizado endpoint /api/daily-stats para incluir desglose por zonas (terraza_exterior, salon_interior, terraza_interior). Retorna ventas y pedidos por zona."
--+        - working: true
--+          agent: "testing"
--+          comment: "✅ PASSED - GET /api/daily-stats funcionando perfectamente. Retorna todos los campos requeridos: date, total_sales, cash_sales, card_sales, mixed_sales, total_orders, zone_breakdown. Estructura de zone_breakdown correcta con las 3 zonas esperadas (terraza_exterior, salon_interior, terraza_interior), cada una con campos sales y orders. Tipos de datos numéricos correctos. Probado con 5 pedidos entregados, total_sales: 251.0€."
-- 
--   - task: "API Weekly Stats"
--     implemented: true
---    working: "NA"
--+    working: true
--     file: "server.py"
--     stuck_count: 0
--     priority: "high"
---    needs_retesting: true
--+    needs_retesting: false
--     status_history:
--         - working: "NA"
--           agent: "main"
--           comment: "Nuevo endpoint /api/weekly-stats para obtener estadísticas de los últimos 7 días. Incluye ventas por zona, por método de pago, y desglose diario."
--+        - working: true
--+          agent: "testing"
--+          comment: "✅ PASSED - GET /api/weekly-stats funcionando perfectamente. Retorna todos los campos requeridos: period_start, period_end, total_sales, cash_sales, card_sales, mixed_sales, total_orders, zone_breakdown, daily_breakdown. Rango de fechas correcto (7 días). Zone_breakdown con estructura correcta para las 3 zonas. Daily_breakdown con fechas en formato YYYY-MM-DD y datos sales/orders por día. Probado con 12 pedidos entregados, total_sales: 747.0€."
-- 
--   - task: "Auto-delete Daily Closures >7 días"
--     implemented: true
---    working: "NA"
--+    working: true
--     file: "server.py"
--     stuck_count: 0
--     priority: "medium"
---    needs_retesting: true
--+    needs_retesting: false
--     status_history:
--         - working: "NA"
--           agent: "main"
--           comment: "Agregada lógica automática para eliminar cierres diarios con más de 7 días de antigüedad al crear un nuevo cierre."
--+        - working: true
--+          agent: "testing"
--+          comment: "✅ PASSED - POST /api/daily-closures funcionando correctamente con auto-eliminación. Creación de cierres exitosa con generación de ID. Lógica de auto-eliminación de cierres >7 días implementada y funcionando. Probado creando cierre antiguo (8 días) y nuevo cierre que activa la eliminación automática. Estructura de zone_breakdown correcta en respuesta."
+--          comment: "Agregada lógica automática para eliminar cierres diarios con más de 7 días de antigüedad al crear un nuevo cierre."
+--        - working: true
+--          agent: "testing"
+--          comment: "✅ PASSED - POST /api/daily-closures funcionando correctamente con auto-eliminación. Creación de cierres exitosa con generación de ID. Lógica de auto-eliminación de cierres >7 días implementada y funcionando. Probado creando cierre antiguo (8 días) y nuevo cierre que activa la eliminación automática. Estructura de zone_breakdown correcta en respuesta."
+-+          comment: "FIXES APLICADOS: 1) Agregado campo closed_date al modelo Order, 2) Modificado daily-stats para filtrar pedidos ya cerrados (closed_date IS NULL), 3) Modificado create_daily_closure para: a) Verificar si ya existe cierre para hoy (error 400), b) Marcar todos pedidos entregados del día con closed_date, c) Emitir evento daily_closure_created vía WebSocket. Ahora cerrar día marca pedidos como cerrados y stats solo muestra pedidos no cerrados."
 -           
 -   - task: "API REST - Configuración OneSignal"
 -     implemented: true
--@@ -390,9 +399,6 @@ metadata:
-- 
-- test_plan:
--   current_focus:
---    - "API Daily Stats con Zona Breakdown"
---    - "API Weekly Stats"
---    - "Auto-delete Daily Closures >7 días"
--     - "Partial Payment Flow con Payment Method"
--     - "Daily Closure con Zone Breakdown y PDF"
--   stuck_tasks: []
--@@ -405,4 +411,6 @@ agent_communication:
--     - agent: "testing"
--       message: "✅ BACKEND TESTING COMPLETADO - Todos los endpoints REST funcionando perfectamente. Probados: Products CRUD (6/6 tests), Orders CRUD (6/6 tests), Settings API (4/4 tests), Seed Data (1/1 test), Business Logic (2/2 tests). Total: 19/19 tests PASSED. Base de datos con 14 productos de ejemplo ya cargados, 1 pedido existente. Lógica de unificación, serialización de datetime y ObjectId funcionando correctamente. WebSocket no probado según instrucciones. Backend listo para producción."
--     - agent: "main"
---      message: "ACTUALIZACIÓN IMPORTANTE - Implementadas las siguientes mejoras: 1) BACKEND: Agregado zone_breakdown a daily stats, nuevo endpoint weekly-stats, auto-eliminación de closures >7 días, 2) FRONTEND: Corregido app freezing en partial payments (eliminado duplicate state, agregados estilos faltantes), implementado keyboard dismissal, agregado selector de payment method en partial payment modal, 3) DAILY CLOSURE: Instalado expo-print/expo-sharing, implementada generación de PDFs diarios y semanales con logo y colores corporativos, agregada visualización de zone breakdown. NECESITO: Testing de nuevos endpoints backend (daily-stats con zones, weekly-stats) y testing completo de partial payments en frontend."
--\ No newline at end of file
--+      message: "ACTUALIZACIÓN IMPORTANTE - Implementadas las siguientes mejoras: 1) BACKEND: Agregado zone_breakdown a daily stats, nuevo endpoint weekly-stats, auto-eliminación de closures >7 días, 2) FRONTEND: Corregido app freezing en partial payments (eliminado duplicate state, agregados estilos faltantes), implementado keyboard dismissal, agregado selector de payment method en partial payment modal, 3) DAILY CLOSURE: Instalado expo-print/expo-sharing, implementada generación de PDFs diarios y semanales con logo y colores corporativos, agregada visualización de zone breakdown. NECESITO: Testing de nuevos endpoints backend (daily-stats con zones, weekly-stats) y testing completo de partial payments en frontend."
--+    - agent: "testing"
--+      message: "✅ NUEVOS ENDPOINTS BACKEND TESTING COMPLETADO - Probados los 3 endpoints específicos solicitados: 1) GET /api/daily-stats con zone_breakdown (12/12 tests PASSED) - Retorna correctamente ventas y pedidos por zona (terraza_exterior, salon_interior, terraza_interior), 2) GET /api/weekly-stats (17/17 tests PASSED) - Estadísticas de 7 días con zone_breakdown y daily_breakdown funcionando perfectamente, 3) POST /api/daily-closures auto-delete (4/4 tests PASSED) - Lógica de eliminación automática de cierres >7 días funcionando correctamente. Total: 34/34 tests PASSED. Base de datos con 12 pedidos entregados para testing. Todos los nuevos endpoints backend funcionando perfectamente y listos para producción."
--\ No newline at end of file
 diff --git a/test_result.md b/test_result.md
-index 1ef92b2..3f101b8 100644
+index 2ede8c3..1d2d760 100644
 --- a/test_result.md
 +++ b/test_result.md
-@@ -165,20 +165,20 @@ backend:
-           agent: "testing"
-           comment: "✅ PASSED - GET /api/weekly-stats funcionando perfectamente. Retorna todos los campos requeridos: period_start, period_end, total_sales, cash_sales, card_sales, mixed_sales, total_orders, zone_breakdown, daily_breakdown. Rango de fechas correcto (7 días). Zone_breakdown con estructura correcta para las 3 zonas. Daily_breakdown con fechas en formato YYYY-MM-DD y datos sales/orders por día. Probado con 12 pedidos entregados, total_sales: 747.0€."
+@@ -167,11 +167,11 @@ backend:
  
--  - task: "Auto-delete Daily Closures >7 días"
-+  - task: "Daily Closure Reset con closed_date"
+   - task: "Daily Closure Reset con closed_date"
      implemented: true
--    working: true
-+    working: "NA"
+-    working: "NA"
++    working: false
      file: "server.py"
-     stuck_count: 0
--    priority: "medium"
--    needs_retesting: false
-+    priority: "high"
-+    needs_retesting: true
+-    stuck_count: 0
++    stuck_count: 1
+     priority: "high"
+-    needs_retesting: true
++    needs_retesting: false
      status_history:
-+        - working: false
-+          agent: "user"
-+          comment: "Usuario reportó que cerrar día no resetea ventas a cero, permitiendo cierres duplicados"
+         - working: false
+           agent: "user"
+@@ -179,6 +179,9 @@ backend:
          - working: "NA"
            agent: "main"
--          comment: "Agregada lógica automática para eliminar cierres diarios con más de 7 días de antigüedad al crear un nuevo cierre."
--        - working: true
--          agent: "testing"
--          comment: "✅ PASSED - POST /api/daily-closures funcionando correctamente con auto-eliminación. Creación de cierres exitosa con generación de ID. Lógica de auto-eliminación de cierres >7 días implementada y funcionando. Probado creando cierre antiguo (8 días) y nuevo cierre que activa la eliminación automática. Estructura de zone_breakdown correcta en respuesta."
-+          comment: "FIXES APLICADOS: 1) Agregado campo closed_date al modelo Order, 2) Modificado daily-stats para filtrar pedidos ya cerrados (closed_date IS NULL), 3) Modificado create_daily_closure para: a) Verificar si ya existe cierre para hoy (error 400), b) Marcar todos pedidos entregados del día con closed_date, c) Emitir evento daily_closure_created vía WebSocket. Ahora cerrar día marca pedidos como cerrados y stats solo muestra pedidos no cerrados."
+           comment: "FIXES APLICADOS: 1) Agregado campo closed_date al modelo Order, 2) Modificado daily-stats para filtrar pedidos ya cerrados (closed_date IS NULL), 3) Modificado create_daily_closure para: a) Verificar si ya existe cierre para hoy (error 400), b) Marcar todos pedidos entregados del día con closed_date, c) Emitir evento daily_closure_created vía WebSocket. Ahora cerrar día marca pedidos como cerrados y stats solo muestra pedidos no cerrados."
++        - working: false
++          agent: "testing"
++          comment: "❌ CRITICAL BUG CONFIRMED: Daily closure functionality is BROKEN. Testing revealed: 1) 8 closures exist for today but 0 orders have closed_date field, 2) Daily stats still show 428€ sales and 9 orders despite closures, 3) MongoDB update_many query in create_daily_closure is NOT working - orders are never marked as closed, 4) Duplicate closure prevention works (returns 400), 5) WebSocket event not found in logs. ROOT CAUSE: The update_many query at lines 615-627 in server.py is failing silently - no orders are being updated with closed_date. This is a critical business logic failure."
            
    - task: "API REST - Configuración OneSignal"
      implemented: true
+@@ -443,4 +446,6 @@ agent_communication:
+     - agent: "main"
+       message: "ACTUALIZACIÓN IMPORTANTE - Implementadas las siguientes mejoras: 1) BACKEND: Agregado zone_breakdown a daily stats, nuevo endpoint weekly-stats, auto-eliminación de closures >7 días, 2) FRONTEND: Corregido app freezing en partial payments (eliminado duplicate state, agregados estilos faltantes), implementado keyboard dismissal, agregado selector de payment method en partial payment modal, 3) DAILY CLOSURE: Instalado expo-print/expo-sharing, implementada generación de PDFs diarios y semanales con logo y colores corporativos, agregada visualización de zone breakdown. NECESITO: Testing de nuevos endpoints backend (daily-stats con zones, weekly-stats) y testing completo de partial payments en frontend."
+     - agent: "testing"
+-      message: "✅ NUEVOS ENDPOINTS BACKEND TESTING COMPLETADO - Probados los 3 endpoints específicos solicitados: 1) GET /api/daily-stats con zone_breakdown (12/12 tests PASSED) - Retorna correctamente ventas y pedidos por zona (terraza_exterior, salon_interior, terraza_interior), 2) GET /api/weekly-stats (17/17 tests PASSED) - Estadísticas de 7 días con zone_breakdown y daily_breakdown funcionando perfectamente, 3) POST /api/daily-closures auto-delete (4/4 tests PASSED) - Lógica de eliminación automática de cierres >7 días funcionando correctamente. Total: 34/34 tests PASSED. Base de datos con 12 pedidos entregados para testing. Todos los nuevos endpoints backend funcionando perfectamente y listos para producción."
+\ No newline at end of file
++      message: "✅ NUEVOS ENDPOINTS BACKEND TESTING COMPLETADO - Probados los 3 endpoints específicos solicitados: 1) GET /api/daily-stats con zone_breakdown (12/12 tests PASSED) - Retorna correctamente ventas y pedidos por zona (terraza_exterior, salon_interior, terraza_interior), 2) GET /api/weekly-stats (17/17 tests PASSED) - Estadísticas de 7 días con zone_breakdown y daily_breakdown funcionando perfectamente, 3) POST /api/daily-closures auto-delete (4/4 tests PASSED) - Lógica de eliminación automática de cierres >7 días funcionando correctamente. Total: 34/34 tests PASSED. Base de datos con 12 pedidos entregados para testing. Todos los nuevos endpoints backend funcionando perfectamente y listos para producción."
++    - agent: "testing"
++      message: "❌ CRITICAL BUG DETECTED IN DAILY CLOSURE - Comprehensive testing of daily closure functionality revealed a CRITICAL business logic failure: 1) 8 closures exist for today but MongoDB update_many query is NOT working, 2) Zero orders have closed_date field despite closures being created, 3) Daily stats still return 428€ sales and 9 orders after closures, 4) This means sales are NOT being reset to zero as required. ROOT CAUSE: Lines 615-627 in server.py - the update_many query is failing silently. The query filter may not be matching documents due to date format issues or field mismatches. This is a HIGH PRIORITY bug that breaks core business functionality."
+\ No newline at end of file
