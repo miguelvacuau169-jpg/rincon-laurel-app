@@ -13,18 +13,11 @@ import sys
 # Get backend URL from frontend .env
 BACKEND_URL = "https://resto-manager-100.preview.emergentagent.com/api"
 
-class BackendTester:
+class DailyClosureTestSuite:
     def __init__(self):
-        self.session = requests.Session()
-        self.session.timeout = TIMEOUT
-        self.test_results = {
-            "daily_stats": {"passed": 0, "failed": 0, "errors": []},
-            "weekly_stats": {"passed": 0, "failed": 0, "errors": []},
-            "daily_closures": {"passed": 0, "failed": 0, "errors": []},
-            "test_data": {"passed": 0, "failed": 0, "errors": []}
-        }
-        self.created_orders = []
-        self.created_closures = []
+        self.base_url = BACKEND_URL
+        self.test_results = []
+        self.created_orders = []  # Track orders we create for cleanup
         
     def log_result(self, category: str, test_name: str, success: bool, error: str = None):
         """Log test result"""
