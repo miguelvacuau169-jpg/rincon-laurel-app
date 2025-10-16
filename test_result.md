@@ -279,11 +279,11 @@ frontend:
 
   - task: "WebSocket Real-time Updates & Performance"
     implemented: true
-    working: "NA"
+    working: false
     file: "context/AppContext.tsx, services/api.ts"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: false
           agent: "user"
@@ -291,14 +291,17 @@ frontend:
         - working: "NA"
           agent: "main"
           comment: "MEJORAS APLICADAS: 1) Agregados listeners faltantes para category_created, category_updated, category_deleted, daily_closure_created en api.ts, 2) Agregado callback onDailyClosureCreated en AppContext para refrescar datos automáticamente, 3) WebSocket ya emite todos eventos correctamente desde backend"
+        - working: false
+          agent: "testing"
+          comment: "❌ CANNOT TEST - App navigation broken, stuck on splash screen. Console shows WebSocket connection failures (404 errors to /socket.io/). Cannot verify real-time updates or performance improvements due to inability to access main app functionality. WebSocket listeners code looks correct but cannot test functionality."
 
   - task: "Partial Payment Flow con Payment Method"
     implemented: true
-    working: "NA"
+    working: false
     file: "app/(tabs)/index.tsx"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: false
           agent: "user"
@@ -306,18 +309,24 @@ frontend:
         - working: "NA"
           agent: "main"
           comment: "FIXES APLICADOS: 1) Eliminado duplicate state declaration de partialPaymentMethod, 2) Agregados imports de Keyboard, KeyboardAvoidingView, Platform, 3) Agregado selector de método de pago en modal (efectivo/tarjeta/ambos), 4) Implementado Keyboard.dismiss en onSubmitEditing, 5) Agregados estilos faltantes para paymentMethodButtons."
+        - working: false
+          agent: "testing"
+          comment: "❌ CANNOT TEST - App stuck on splash screen, cannot access Orders tab to test partial payment functionality. Code review shows fixes are implemented (duplicate state removed, payment method selector added, keyboard handling) but cannot verify if freezing issue is resolved due to navigation blocking issue."
 
   - task: "Daily Closure con Zone Breakdown y PDF"
     implemented: true
-    working: "NA"
+    working: false
     file: "app/(tabs)/daily-closure.tsx"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "NUEVAS FUNCIONALIDADES: 1) Instalado expo-print y expo-sharing, 2) Agregada visualización de zone_breakdown en stats diarios, 3) Implementado generateDailyPDF con logo y colores corporativos, 4) Implementado generateWeeklyPDF con datos de 7 días, 5) Agregados botones PDF Diario y PDF Semanal, 6) PDFs incluyen: fecha, ventas por método de pago, desglose por zonas, total pedidos, promedios."
+        - working: false
+          agent: "testing"
+          comment: "❌ CANNOT TEST - App navigation broken, cannot access Cierre Diario tab to test daily closure functionality, zone breakdown display, or PDF generation. Backend daily-stats endpoint works correctly but frontend cannot be tested due to splash screen blocking issue. Critical daily closure reset bug also cannot be verified."
 
   - task: "Navegación y Routing (Expo Router)"
     implemented: true
