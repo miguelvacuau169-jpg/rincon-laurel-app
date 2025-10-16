@@ -593,17 +593,49 @@ async def get_daily_stats(date: Optional[str] = None):
 @api_router.post("/daily-closures")
 async def create_daily_closure(closure: DailyClosure):
     try:
+        # Verificar si ya existe un cierre para hoy
+        today = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+        existing_closure = await db.daily_closures.find_one({
+            'date': {'$gte': today}
+        })
+        
+        if existing_closure:
+            raise HTTPException(status_code=400, detail="Ya existe un cierre para el día de hoy")
+        
         closure_dict = closure.model_dump(by_alias=True, exclude=['id'])
         closure_dict['created_at'] = datetime.utcnow()
         
         result = await db.daily_closures.insert_one(closure_dict)
         closure_dict['_id'] = str(result.inserted_id)
         
+        # Marcar todos los pedidos entregados del día como cerrados
+        start_of_day = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+        end_of_day = datetime.utcnow().replace(hour=23, minute=59, second=59, microsecond=999999)
+        
+        await db.orders.update_many(
+            {
+                'created_at': {'$gte': start_of_day, '$lte': end_of_day},
+                'status': 'entregado',
+                '$or': [
+                    {'closed_date': None},
+                    {'closed_date': {'$exists': False}}
+                ]
+            },
+            {
+                '$set': {'closed_date': datetime.utcnow()}
+            }
+        )
+        
         # Eliminar cierres más antiguos de 7 días
         seven_days_ago = datetime.utcnow() - timedelta(days=7)
         await db.daily_closures.delete_many({'date': {'$lt': seven_days_ago}})
         
+        # Emitir evento de cierre a través de WebSocket
+        await sio.emit('daily_closure_created', serialize_doc(closure_dict))
+        
         return serialize_doc(closure_dict)
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error creating daily closure: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
