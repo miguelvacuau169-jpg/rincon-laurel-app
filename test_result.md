@@ -399,9 +399,6 @@ metadata:
 
 test_plan:
   current_focus:
-    - "API Daily Stats con Zona Breakdown"
-    - "API Weekly Stats"
-    - "Auto-delete Daily Closures >7 días"
     - "Partial Payment Flow con Payment Method"
     - "Daily Closure con Zone Breakdown y PDF"
   stuck_tasks: []
@@ -415,3 +412,5 @@ agent_communication:
       message: "✅ BACKEND TESTING COMPLETADO - Todos los endpoints REST funcionando perfectamente. Probados: Products CRUD (6/6 tests), Orders CRUD (6/6 tests), Settings API (4/4 tests), Seed Data (1/1 test), Business Logic (2/2 tests). Total: 19/19 tests PASSED. Base de datos con 14 productos de ejemplo ya cargados, 1 pedido existente. Lógica de unificación, serialización de datetime y ObjectId funcionando correctamente. WebSocket no probado según instrucciones. Backend listo para producción."
     - agent: "main"
       message: "ACTUALIZACIÓN IMPORTANTE - Implementadas las siguientes mejoras: 1) BACKEND: Agregado zone_breakdown a daily stats, nuevo endpoint weekly-stats, auto-eliminación de closures >7 días, 2) FRONTEND: Corregido app freezing en partial payments (eliminado duplicate state, agregados estilos faltantes), implementado keyboard dismissal, agregado selector de payment method en partial payment modal, 3) DAILY CLOSURE: Instalado expo-print/expo-sharing, implementada generación de PDFs diarios y semanales con logo y colores corporativos, agregada visualización de zone breakdown. NECESITO: Testing de nuevos endpoints backend (daily-stats con zones, weekly-stats) y testing completo de partial payments en frontend."
+    - agent: "testing"
+      message: "✅ NUEVOS ENDPOINTS BACKEND TESTING COMPLETADO - Probados los 3 endpoints específicos solicitados: 1) GET /api/daily-stats con zone_breakdown (12/12 tests PASSED) - Retorna correctamente ventas y pedidos por zona (terraza_exterior, salon_interior, terraza_interior), 2) GET /api/weekly-stats (17/17 tests PASSED) - Estadísticas de 7 días con zone_breakdown y daily_breakdown funcionando perfectamente, 3) POST /api/daily-closures auto-delete (4/4 tests PASSED) - Lógica de eliminación automática de cierres >7 días funcionando correctamente. Total: 34/34 tests PASSED. Base de datos con 12 pedidos entregados para testing. Todos los nuevos endpoints backend funcionando perfectamente y listos para producción."
