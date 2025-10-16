@@ -611,6 +611,86 @@ async def get_daily_closures(limit: int = 30):
         logger.error(f"Error fetching daily closures: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.get("/weekly-stats")
+async def get_weekly_stats():
+    """
+    Obtiene estadísticas de la última semana (7 días)
+    """
+    try:
+        # Calcular fecha de inicio (hace 7 días)
+        seven_days_ago = datetime.utcnow() - timedelta(days=7)
+        start_of_period = datetime(seven_days_ago.year, seven_days_ago.month, seven_days_ago.day, 0, 0, 0)
+        
+        # Obtener pedidos entregados de los últimos 7 días
+        orders = await db.orders.find({
+            'status': 'entregado',
+            'created_at': {'$gte': start_of_period}
+        }).to_list(None)
+        
+        total_sales = 0
+        cash_sales = 0
+        card_sales = 0
+        mixed_sales = 0
+        zone_breakdown = {
+            'terraza_exterior': {'sales': 0, 'orders': 0},
+            'salon_interior': {'sales': 0, 'orders': 0},
+            'terraza_interior': {'sales': 0, 'orders': 0}
+        }
+        daily_breakdown = {}  # {'2025-01-10': {'sales': X, 'orders': Y}, ...}
+        
+        for order in orders:
+            amount = order.get('total', 0)
+            total_sales += amount
+            
+            # Zona
+            zone = order.get('zone', 'terraza_exterior')
+            if zone in zone_breakdown:
+                zone_breakdown[zone]['sales'] += amount
+                zone_breakdown[zone]['orders'] += 1
+            
+            # Método de pago
+            payment_method = order.get('payment_method', '')
+            if payment_method == 'efectivo':
+                cash_sales += amount
+            elif payment_method == 'tarjeta':
+                card_sales += amount
+            elif payment_method == 'ambos':
+                mixed_sales += amount
+            
+            # Desglose por día
+            order_date = order.get('created_at')
+            if isinstance(order_date, datetime):
+                day_key = order_date.strftime('%Y-%m-%d')
+            else:
+                day_key = datetime.fromisoformat(str(order_date)).strftime('%Y-%m-%d')
+            
+            if day_key not in daily_breakdown:
+                daily_breakdown[day_key] = {'sales': 0, 'orders': 0}
+            daily_breakdown[day_key]['sales'] += amount
+            daily_breakdown[day_key]['orders'] += 1
+        
+        # Redondear valores
+        for zone in zone_breakdown:
+            zone_breakdown[zone]['sales'] = round(zone_breakdown[zone]['sales'], 2)
+        
+        for day in daily_breakdown:
+            daily_breakdown[day]['sales'] = round(daily_breakdown[day]['sales'], 2)
+        
+        return {
+            'period_start': start_of_period.isoformat(),
+            'period_end': datetime.utcnow().isoformat(),
+            'total_sales': round(total_sales, 2),
+            'cash_sales': round(cash_sales, 2),
+            'card_sales': round(card_sales, 2),
+            'mixed_sales': round(mixed_sales, 2),
+            'total_orders': len(orders),
+            'zone_breakdown': zone_breakdown,
+            'daily_breakdown': daily_breakdown
+        }
+    except Exception as e:
+        logger.error(f"Error getting weekly stats: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # ===== SETTINGS =====
 
 @api_router.get("/settings")
