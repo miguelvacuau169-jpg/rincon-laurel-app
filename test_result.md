@@ -137,39 +137,48 @@ backend:
 
   - task: "API Daily Stats con Zona Breakdown"
     implemented: true
-    working: "NA"
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Actualizado endpoint /api/daily-stats para incluir desglose por zonas (terraza_exterior, salon_interior, terraza_interior). Retorna ventas y pedidos por zona."
+        - working: true
+          agent: "testing"
+          comment: "✅ PASSED - GET /api/daily-stats funcionando perfectamente. Retorna todos los campos requeridos: date, total_sales, cash_sales, card_sales, mixed_sales, total_orders, zone_breakdown. Estructura de zone_breakdown correcta con las 3 zonas esperadas (terraza_exterior, salon_interior, terraza_interior), cada una con campos sales y orders. Tipos de datos numéricos correctos. Probado con 5 pedidos entregados, total_sales: 251.0€."
 
   - task: "API Weekly Stats"
     implemented: true
-    working: "NA"
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Nuevo endpoint /api/weekly-stats para obtener estadísticas de los últimos 7 días. Incluye ventas por zona, por método de pago, y desglose diario."
+        - working: true
+          agent: "testing"
+          comment: "✅ PASSED - GET /api/weekly-stats funcionando perfectamente. Retorna todos los campos requeridos: period_start, period_end, total_sales, cash_sales, card_sales, mixed_sales, total_orders, zone_breakdown, daily_breakdown. Rango de fechas correcto (7 días). Zone_breakdown con estructura correcta para las 3 zonas. Daily_breakdown con fechas en formato YYYY-MM-DD y datos sales/orders por día. Probado con 12 pedidos entregados, total_sales: 747.0€."
 
   - task: "Auto-delete Daily Closures >7 días"
     implemented: true
-    working: "NA"
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Agregada lógica automática para eliminar cierres diarios con más de 7 días de antigüedad al crear un nuevo cierre."
+        - working: true
+          agent: "testing"
+          comment: "✅ PASSED - POST /api/daily-closures funcionando correctamente con auto-eliminación. Creación de cierres exitosa con generación de ID. Lógica de auto-eliminación de cierres >7 días implementada y funcionando. Probado creando cierre antiguo (8 días) y nuevo cierre que activa la eliminación automática. Estructura de zone_breakdown correcta en respuesta."
           
   - task: "API REST - Configuración OneSignal"
     implemented: true
