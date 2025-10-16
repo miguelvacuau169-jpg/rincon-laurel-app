@@ -437,16 +437,19 @@ frontend:
           comment: "Paleta extraída del logo: Marrón #6B5149, Verde turquesa #2D7A6B, Dorado #D4AF37, Beige #F5E6D3, Verde oliva #6B7A3E"
 
   - task: "App Navigation and Splash Screen Fix"
-    implemented: false
+    implemented: true
     working: false
     file: "app/index.tsx, app/_layout.tsx, context/AppContext.tsx"
-    stuck_count: 0
+    stuck_count: 1
     priority: "critical"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: false
           agent: "testing"
           comment: "❌ CRITICAL BLOCKING ISSUE - App completely stuck on splash screen, cannot progress to role selection or main app. Navigation system broken. App loads correctly with proper backend configuration but never transitions past splash screen despite 2.5s timer. Role loading from AsyncStorage may be failing or navigation routing is broken. This blocks ALL frontend functionality testing. URGENT FIX REQUIRED."
+        - working: false
+          agent: "testing"
+          comment: "❌ SPLASH SCREEN NAVIGATION STILL BROKEN - Comprehensive mobile testing (iPhone 390x844) confirmed: 1) Splash screen displays correctly with restaurant logo, 2) Timer runs for 2.5 seconds but app never transitions to role-selection automatically, 3) WORKAROUND: Direct navigation to /role-selection works perfectly, 4) Once in role-selection, all navigation works flawlessly. ROOT CAUSE: AsyncStorage role loading or useEffect dependencies in splash screen. The [role, router] dependency fix was applied but issue persists. App is fully functional when bypassing splash screen."
 
 metadata:
   created_by: "main_agent"
