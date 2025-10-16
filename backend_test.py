@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Any
 
 # Configuration
-BASE_URL = "https://laurel-sync.preview.emergentagent.com/api"
+BASE_URL = "https://resto-manager-100.preview.emergentagent.com/api"
 TIMEOUT = 30
 
 class BackendTester:
