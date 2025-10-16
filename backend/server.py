@@ -113,6 +113,7 @@ class Order(BaseModel):
     created_at: Optional[datetime] = Field(default_factory=datetime.utcnow)
     updated_at: Optional[datetime] = Field(default_factory=datetime.utcnow)
     unified_with: Optional[List[str]] = []
+    closed_date: Optional[datetime] = None  # Fecha en la que se cerró el día con este pedido
 
     class Config:
         json_encoders = {ObjectId: str}
