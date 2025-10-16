@@ -67,6 +67,7 @@ export default function DailyClosureScreen() {
                 card_sales: stats.card_sales,
                 mixed_sales: stats.mixed_sales,
                 total_orders: stats.total_orders,
+                zone_breakdown: stats.zone_breakdown || {},
                 closed_by: role || 'administrador',
               });
               Alert.alert('Éxito', 'Cierre diario guardado correctamente');
@@ -81,6 +82,316 @@ export default function DailyClosureScreen() {
         },
       ]
     );
+  };
+
+  const generateDailyPDF = async () => {
+    if (!stats) return;
+    
+    setGeneratingPDF(true);
+    try {
+      const today = format(new Date(), 'dd/MM/yyyy');
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+              body {
+                font-family: Arial, sans-serif;
+                padding: 20px;
+                color: #333;
+              }
+              .header {
+                text-align: center;
+                margin-bottom: 30px;
+                border-bottom: 3px solid #6B7A3E;
+                padding-bottom: 20px;
+              }
+              .logo {
+                width: 120px;
+                height: 120px;
+                margin: 0 auto 15px;
+              }
+              h1 {
+                color: #6B5149;
+                margin: 10px 0;
+                font-size: 24px;
+              }
+              .subtitle {
+                color: #2D7A6B;
+                font-size: 14px;
+              }
+              .section {
+                margin: 25px 0;
+                padding: 15px;
+                background: #F5E6D3;
+                border-radius: 8px;
+              }
+              .section-title {
+                color: #6B5149;
+                font-size: 18px;
+                margin-bottom: 15px;
+                font-weight: bold;
+              }
+              .row {
+                display: flex;
+                justify-content: space-between;
+                padding: 8px 0;
+                border-bottom: 1px solid #D4AF37;
+              }
+              .row:last-child {
+                border-bottom: none;
+              }
+              .label {
+                font-weight: 600;
+                color: #6B5149;
+              }
+              .value {
+                color: #2D7A6B;
+                font-weight: bold;
+              }
+              .total-row {
+                font-size: 20px;
+                margin-top: 15px;
+                padding-top: 15px;
+                border-top: 2px solid #6B7A3E;
+              }
+              .footer {
+                text-align: center;
+                margin-top: 40px;
+                color: #999;
+                font-size: 12px;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h1>El Rincón del Laurel</h1>
+              <div class="subtitle">Cierre Diario - ${today}</div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Resumen de Ventas</div>
+              <div class="row">
+                <span class="label">💵 Efectivo:</span>
+                <span class="value">€${stats.cash_sales.toFixed(2)}</span>
+              </div>
+              <div class="row">
+                <span class="label">💳 Tarjeta:</span>
+                <span class="value">€${stats.card_sales.toFixed(2)}</span>
+              </div>
+              <div class="row">
+                <span class="label">🔄 Mixto:</span>
+                <span class="value">€${stats.mixed_sales.toFixed(2)}</span>
+              </div>
+              <div class="row total-row">
+                <span class="label">TOTAL:</span>
+                <span class="value">€${stats.total_sales.toFixed(2)}</span>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Desglose por Zonas</div>
+              ${Object.entries(stats.zone_breakdown || {}).map(([zone, data]: [string, any]) => `
+                <div class="row">
+                  <span class="label">${ZONE_LABELS[zone] || zone}:</span>
+                  <span class="value">€${data.sales.toFixed(2)} (${data.orders} pedidos)</span>
+                </div>
+              `).join('')}
+            </div>
+
+            <div class="section">
+              <div class="section-title">Resumen General</div>
+              <div class="row">
+                <span class="label">Total de Pedidos:</span>
+                <span class="value">${stats.total_orders}</span>
+              </div>
+              <div class="row">
+                <span class="label">Promedio por Pedido:</span>
+                <span class="value">€${(stats.total_sales / stats.total_orders).toFixed(2)}</span>
+              </div>
+            </div>
+
+            <div class="footer">
+              Generado el ${format(new Date(), 'dd/MM/yyyy HH:mm')}
+            </div>
+          </body>
+        </html>
+      `;
+
+      const { uri } = await Print.printToFileAsync({ html: htmlContent });
+      await Sharing.shareAsync(uri, {
+        UTI: '.pdf',
+        mimeType: 'application/pdf',
+      });
+      Alert.alert('Éxito', 'PDF generado correctamente');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      Alert.alert('Error', 'No se pudo generar el PDF');
+    } finally {
+      setGeneratingPDF(false);
+    }
+  };
+
+  const generateWeeklyPDF = async () => {
+    setGeneratingPDF(true);
+    try {
+      const weeklyData = await api.getWeeklyStats();
+      const today = format(new Date(), 'dd/MM/yyyy');
+      
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+              body {
+                font-family: Arial, sans-serif;
+                padding: 20px;
+                color: #333;
+              }
+              .header {
+                text-align: center;
+                margin-bottom: 30px;
+                border-bottom: 3px solid #6B7A3E;
+                padding-bottom: 20px;
+              }
+              h1 {
+                color: #6B5149;
+                margin: 10px 0;
+                font-size: 24px;
+              }
+              .subtitle {
+                color: #2D7A6B;
+                font-size: 14px;
+              }
+              .section {
+                margin: 25px 0;
+                padding: 15px;
+                background: #F5E6D3;
+                border-radius: 8px;
+              }
+              .section-title {
+                color: #6B5149;
+                font-size: 18px;
+                margin-bottom: 15px;
+                font-weight: bold;
+              }
+              .row {
+                display: flex;
+                justify-content: space-between;
+                padding: 8px 0;
+                border-bottom: 1px solid #D4AF37;
+              }
+              .row:last-child {
+                border-bottom: none;
+              }
+              .label {
+                font-weight: 600;
+                color: #6B5149;
+              }
+              .value {
+                color: #2D7A6B;
+                font-weight: bold;
+              }
+              .total-row {
+                font-size: 20px;
+                margin-top: 15px;
+                padding-top: 15px;
+                border-top: 2px solid #6B7A3E;
+              }
+              .footer {
+                text-align: center;
+                margin-top: 40px;
+                color: #999;
+                font-size: 12px;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h1>El Rincón del Laurel</h1>
+              <div class="subtitle">Resumen Semanal - ${today}</div>
+              <div class="subtitle">(Últimos 7 días)</div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Resumen de Ventas</div>
+              <div class="row">
+                <span class="label">💵 Efectivo:</span>
+                <span class="value">€${weeklyData.cash_sales.toFixed(2)}</span>
+              </div>
+              <div class="row">
+                <span class="label">💳 Tarjeta:</span>
+                <span class="value">€${weeklyData.card_sales.toFixed(2)}</span>
+              </div>
+              <div class="row">
+                <span class="label">🔄 Mixto:</span>
+                <span class="value">€${weeklyData.mixed_sales.toFixed(2)}</span>
+              </div>
+              <div class="row total-row">
+                <span class="label">TOTAL:</span>
+                <span class="value">€${weeklyData.total_sales.toFixed(2)}</span>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Desglose por Zonas</div>
+              ${Object.entries(weeklyData.zone_breakdown || {}).map(([zone, data]: [string, any]) => `
+                <div class="row">
+                  <span class="label">${ZONE_LABELS[zone] || zone}:</span>
+                  <span class="value">€${data.sales.toFixed(2)} (${data.orders} pedidos)</span>
+                </div>
+              `).join('')}
+            </div>
+
+            <div class="section">
+              <div class="section-title">Resumen General</div>
+              <div class="row">
+                <span class="label">Total de Pedidos:</span>
+                <span class="value">${weeklyData.total_orders}</span>
+              </div>
+              <div class="row">
+                <span class="label">Promedio por Pedido:</span>
+                <span class="value">€${(weeklyData.total_sales / weeklyData.total_orders).toFixed(2)}</span>
+              </div>
+              <div class="row">
+                <span class="label">Promedio Diario:</span>
+                <span class="value">€${(weeklyData.total_sales / 7).toFixed(2)}</span>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Desglose por Día</div>
+              ${Object.entries(weeklyData.daily_breakdown || {})
+                .sort(([a], [b]) => b.localeCompare(a))
+                .map(([date, data]: [string, any]) => `
+                <div class="row">
+                  <span class="label">${format(new Date(date), 'dd/MM/yyyy')}:</span>
+                  <span class="value">€${data.sales.toFixed(2)} (${data.orders} pedidos)</span>
+                </div>
+              `).join('')}
+            </div>
+
+            <div class="footer">
+              Generado el ${format(new Date(), 'dd/MM/yyyy HH:mm')}
+            </div>
+          </body>
+        </html>
+      `;
+
+      const { uri } = await Print.printToFileAsync({ html: htmlContent });
+      await Sharing.shareAsync(uri, {
+        UTI: '.pdf',
+        mimeType: 'application/pdf',
+      });
+      Alert.alert('Éxito', 'PDF semanal generado correctamente');
+    } catch (error) {
+      console.error('Error generating weekly PDF:', error);
+      Alert.alert('Error', 'No se pudo generar el PDF semanal');
+    } finally {
+      setGeneratingPDF(false);
+    }
   };
 
   const renderClosureItem = ({ item }: { item: any }) => {
