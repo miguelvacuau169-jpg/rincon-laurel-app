@@ -37,7 +37,11 @@ export const initSocket = (role: string, callbacks: any) => {
   socket.on('product_created', callbacks.onProductCreated);
   socket.on('product_updated', callbacks.onProductUpdated);
   socket.on('product_deleted', callbacks.onProductDeleted);
+  socket.on('category_created', callbacks.onCategoryCreated);
+  socket.on('category_updated', callbacks.onCategoryUpdated);
+  socket.on('category_deleted', callbacks.onCategoryDeleted);
   socket.on('notification', callbacks.onNotification);
+  socket.on('daily_closure_created', callbacks.onDailyClosureCreated);
 
   return socket;
 };
