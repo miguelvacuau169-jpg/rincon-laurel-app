@@ -835,6 +835,101 @@ async def seed_data():
         logger.error(f"Error seeding data: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.post("/seed-data")
+async def seed_data():
+    """Seed initial data (products)"""
+    try:
+        # Verificar si ya hay productos
+        existing_products = await db.products.count_documents({})
+        if existing_products > 0:
+            return {"message": "Data already seeded", "products_count": existing_products}
+        
+        # Categorías de ejemplo
+        categories = [
+            {"name": "Comidas", "icon": "🍽️"},
+            {"name": "Bebidas", "icon": "🥤"},
+            {"name": "Postres", "icon": "🍰"}
+        ]
+        
+        await db.categories.insert_many(categories)
+        
+        # Productos de ejemplo
+        products = [
+            {"name": "Paella", "category": "comidas", "price": 12.50, "created_at": datetime.utcnow()},
+            {"name": "Tapas", "category": "comidas", "price": 8.00, "created_at": datetime.utcnow()},
+            {"name": "Tortilla", "category": "comidas", "price": 6.50, "created_at": datetime.utcnow()},
+            {"name": "Cerveza", "category": "bebidas", "price": 2.50, "created_at": datetime.utcnow()},
+            {"name": "Vino", "category": "bebidas", "price": 3.00, "created_at": datetime.utcnow()},
+            {"name": "Refresco", "category": "bebidas", "price": 2.00, "created_at": datetime.utcnow()},
+            {"name": "Tarta", "category": "postres", "price": 4.50, "created_at": datetime.utcnow()},
+            {"name": "Helado", "category": "postres", "price": 3.50, "created_at": datetime.utcnow()},
+        ]
+        
+        await db.products.insert_many(products)
+        
+        return {
+            "message": "Data seeded successfully",
+            "products_count": len(products),
+            "categories_count": len(categories)
+        }
+    except Exception as e:
+        logger.error(f"Error seeding data: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/test-orders")
+async def create_test_orders():
+    """Crear pedidos de prueba con fecha actual para testing"""
+    try:
+        # Obtener productos existentes
+        products = await db.products.find().limit(5).to_list(5)
+        if not products:
+            raise HTTPException(status_code=404, detail="No hay productos. Ejecuta /api/seed-data primero")
+        
+        # Crear 3 pedidos de prueba
+        test_orders = []
+        zones = ['terraza_exterior', 'salon_interior', 'terraza_interior']
+        
+        for i in range(3):
+            order = {
+                'table_number': i + 1,
+                'zone': zones[i % 3],
+                'waiter_role': 'camarero_1',
+                'products': [
+                    {
+                        'product_id': str(products[0]['_id']),
+                        'name': products[0]['name'],
+                        'category': products[0]['category'],
+                        'price': products[0]['price'],
+                        'original_price': products[0]['price'],
+                        'quantity': 1,
+                        'note': '',
+                        'is_paid': False
+                    }
+                ],
+                'total': products[0]['price'],
+                'paid_amount': 0,
+                'pending_amount': products[0]['price'],
+                'status': 'entregado',
+                'payment_method': 'efectivo' if i == 0 else 'tarjeta' if i == 1 else 'ambos',
+                'partial_payments': [],
+                'special_note': None,
+                'created_at': datetime.utcnow(),
+                'updated_at': datetime.utcnow(),
+                'unified_with': []
+            }
+            test_orders.append(order)
+        
+        result = await db.orders.insert_many(test_orders)
+        
+        return {
+            "message": "Test orders created successfully",
+            "count": len(result.inserted_ids),
+            "order_ids": [str(id) for id in result.inserted_ids]
+        }
+    except Exception as e:
+        logger.error(f"Error creating test orders: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Include the router in the main app
 app.include_router(api_router)
 
