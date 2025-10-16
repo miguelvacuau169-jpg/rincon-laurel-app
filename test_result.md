@@ -300,7 +300,7 @@ frontend:
 
   - task: "Partial Payment Flow con Payment Method"
     implemented: true
-    working: false
+    working: "NA"
     file: "app/(tabs)/index.tsx"
     stuck_count: 2
     priority: "high"
@@ -315,6 +315,9 @@ frontend:
         - working: false
           agent: "testing"
           comment: "❌ CANNOT TEST - App stuck on splash screen, cannot access Orders tab to test partial payment functionality. Code review shows fixes are implemented (duplicate state removed, payment method selector added, keyboard handling) but cannot verify if freezing issue is resolved due to navigation blocking issue."
+        - working: "NA"
+          agent: "testing"
+          comment: "⚠️ PARTIAL TEST COMPLETED - Mobile testing (iPhone 390x844) shows: 1) Orders tab accessible with 30+ orders displayed, 2) Order details expand correctly showing products and totals, 3) Partial payment button ('Cobro Parcial') not found in current UI - may be conditional based on order status, 4) App does not freeze when navigating orders, 5) Code review confirms all fixes implemented (duplicate state removed, payment method selector, keyboard handling). Cannot fully verify partial payment flow without triggering the modal."
 
   - task: "Daily Closure con Zone Breakdown y PDF"
     implemented: true
@@ -488,3 +491,5 @@ agent_communication:
       message: "❌ CRITICAL BUG DETECTED IN DAILY CLOSURE - Comprehensive testing of daily closure functionality revealed a CRITICAL business logic failure: 1) 8 closures exist for today but MongoDB update_many query is NOT working, 2) Zero orders have closed_date field despite closures being created, 3) Daily stats still return 428€ sales and 9 orders after closures, 4) This means sales are NOT being reset to zero as required. ROOT CAUSE: Lines 615-627 in server.py - the update_many query is failing silently. The query filter may not be matching documents due to date format issues or field mismatches. This is a HIGH PRIORITY bug that breaks core business functionality."
     - agent: "testing"
       message: "❌ CRITICAL FRONTEND ISSUE DETECTED - Comprehensive mobile testing (iPhone 390x844) revealed app is STUCK on splash screen and cannot progress to main functionality. FINDINGS: 1) App loads correctly with proper backend URL configuration, 2) Splash screen displays restaurant logo but never transitions to role selection or main app, 3) Navigation system appears broken - no tabs accessible, 4) Role selection mechanism not functioning, 5) Cannot test any of the reported fixes (category buttons, daily closure, partial payments) due to navigation failure. ROOT CAUSE: App initialization or routing issue preventing progression past splash screen. This is a BLOCKING issue that prevents any frontend functionality testing. PRIORITY: CRITICAL - App is completely unusable on mobile."
+    - agent: "testing"
+      message: "✅ COMPREHENSIVE MOBILE TESTING COMPLETED (iPhone 390x844) - MAJOR FINDINGS: 1) ✅ NAVIGATION FIX PARTIALLY WORKING: Direct access to /role-selection works perfectly, all tabs navigate flawlessly once past splash screen, 2) ❌ SPLASH SCREEN ISSUE PERSISTS: Auto-navigation from splash to role-selection still broken despite [role, router] dependency fix, 3) ✅ DAILY CLOSURE FRONTEND EXCELLENT: Zone breakdown displays perfectly (€521 total, 3 zones with detailed stats), payment methods shown correctly, 4) ❌ DAILY CLOSURE BACKEND BUG CONFIRMED: Cerrar Día button works but sales don't reset to zero (backend issue), 5) ✅ ORDERS TAB WORKING: 30+ orders displayed, order details expand properly, 6) ⚠️ PARTIAL PAYMENT: Cannot fully test as button not visible (may be status-dependent), 7) ⚠️ CATEGORY BUTTONS: Add product button not found during testing. WORKAROUND: Users can access app via /role-selection URL directly."
