@@ -589,13 +589,45 @@ export default function OrdersScreen() {
               ))}
           </ScrollView>
 
+          <Text style={styles.selectProductsLabel}>Método de Pago:</Text>
+          <View style={styles.paymentMethodButtons}>
+            {[
+              { value: 'efectivo', label: 'Efectivo', icon: 'cash' },
+              { value: 'tarjeta', label: 'Tarjeta', icon: 'card' },
+              { value: 'ambos', label: 'Ambos', icon: 'swap-horizontal' }
+            ].map((method) => (
+              <TouchableOpacity
+                key={method.value}
+                style={[
+                  styles.paymentMethodButton,
+                  partialPaymentMethod === method.value && styles.paymentMethodButtonActive,
+                ]}
+                onPress={() => setPartialPaymentMethod(method.value)}
+              >
+                <Ionicons 
+                  name={method.icon as any}
+                  size={18} 
+                  color={partialPaymentMethod === method.value ? Colors.white : Colors.text} 
+                />
+                <Text style={[
+                  styles.paymentMethodText,
+                  partialPaymentMethod === method.value && styles.paymentMethodTextActive,
+                ]}>
+                  {method.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
           <TextInput
             style={styles.priceInput}
-            placeholder="Monto a cobrar"
+            placeholder="Monto a cobrar (opcional si seleccionaste productos)"
             placeholderTextColor={Colors.gray}
             value={partialAmount}
             onChangeText={setPartialAmount}
             keyboardType="decimal-pad"
+            returnKeyType="done"
+            onSubmitEditing={() => {}}
           />
           <View style={styles.smallModalActions}>
             <TouchableOpacity
