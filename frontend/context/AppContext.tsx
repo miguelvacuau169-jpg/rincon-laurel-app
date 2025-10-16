@@ -162,6 +162,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
             Alert.alert('Notificación', notification.message, [{ text: 'OK' }]);
           }
         },
+        onDailyClosureCreated: (closure: any) => {
+          console.log('Daily closure created:', closure);
+          // Refrescar datos para actualizar stats
+          refreshData();
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        },
       });
 
       refreshData();
