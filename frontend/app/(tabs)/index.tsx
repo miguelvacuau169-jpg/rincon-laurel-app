@@ -153,8 +153,6 @@ export default function OrdersScreen() {
     }
   };
 
-  const [partialPaymentMethod, setPartialPaymentMethod] = useState('efectivo');
-
   const openPartialPaymentModal = () => {
     setPartialPaymentModalVisible(true);
     setPartialAmount('');
