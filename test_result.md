@@ -436,6 +436,18 @@ frontend:
           agent: "main"
           comment: "Paleta extraída del logo: Marrón #6B5149, Verde turquesa #2D7A6B, Dorado #D4AF37, Beige #F5E6D3, Verde oliva #6B7A3E"
 
+  - task: "App Navigation and Splash Screen Fix"
+    implemented: false
+    working: false
+    file: "app/index.tsx, app/_layout.tsx, context/AppContext.tsx"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "❌ CRITICAL BLOCKING ISSUE - App completely stuck on splash screen, cannot progress to role selection or main app. Navigation system broken. App loads correctly with proper backend configuration but never transitions past splash screen despite 2.5s timer. Role loading from AsyncStorage may be failing or navigation routing is broken. This blocks ALL frontend functionality testing. URGENT FIX REQUIRED."
+
 metadata:
   created_by: "main_agent"
   version: "1.1"
