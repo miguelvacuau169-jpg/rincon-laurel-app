@@ -538,10 +538,7 @@ async def get_daily_stats(date: Optional[str] = None):
         orders = await db.orders.find({
             'created_at': {'$gte': start_of_day, '$lte': end_of_day},
             'status': 'entregado',
-            '$or': [
-                {'closed_date': None},
-                {'closed_date': {'$exists': False}}
-            ]
+            'closed_date': {'$exists': False}
         }).to_list(1000)
         
         total_sales = 0
