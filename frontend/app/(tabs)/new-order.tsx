@@ -44,6 +44,7 @@ export default function NewOrderScreen() {
     { value: 'terraza_exterior', label: 'Terraza Exterior', icon: 'sunny' },
     { value: 'salon_interior', label: 'Salón Interior', icon: 'home' },
     { value: 'terraza_interior', label: 'Terraza Interior', icon: 'leaf' },
+    { value: 'barra', label: 'Barra', icon: 'beer' },
   ];
 
   const paymentMethods = [
