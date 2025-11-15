@@ -288,6 +288,12 @@ export default function OrdersScreen() {
                 </Text>
               </View>
             )}
+            {item.created_by && (
+              <View style={styles.userBadge}>
+                <Ionicons name="person" size={12} color={Colors.olive} />
+                <Text style={styles.userText}>{item.created_by}</Text>
+              </View>
+            )}
           </View>
           <View style={styles.orderBodyRight}>
             <Text style={styles.totalText}>€{item.total.toFixed(2)}</Text>
