@@ -226,7 +226,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const createOrder = async (order: any) => {
     try {
-      await api.createOrder(order);
+      const orderWithUser = {
+        ...order,
+        created_by: username
+      };
+      await api.createOrder(orderWithUser);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (error) {
       console.error('Error creating order:', error);
