@@ -115,6 +115,23 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     loadRole();
   }, []);
 
+  // Inicializar OneSignal para notificaciones push
+  useEffect(() => {
+    const initNotifications = async () => {
+      try {
+        await initializeOneSignal();
+        const listener = addNotificationListener((notification) => {
+          console.log('Notification received:', notification);
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        });
+        return () => listener.remove();
+      } catch (error) {
+        console.error('Error initializing OneSignal:', error);
+      }
+    };
+    initNotifications();
+  }, []);
+
   useEffect(() => {
     if (role) {
       const socket = initSocket(role, {
