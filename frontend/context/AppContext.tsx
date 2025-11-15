@@ -50,6 +50,7 @@ interface Order {
 
 interface AppContextType {
   role: string | null;
+  username: string | null;
   setRole: (role: string) => void;
   orders: Order[];
   products: Product[];
