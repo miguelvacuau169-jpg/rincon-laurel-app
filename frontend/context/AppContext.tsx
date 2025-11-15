@@ -81,14 +81,24 @@ export const useApp = () => {
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [role, setRoleState] = useState<string | null>(null);
+  const [username, setUsernameState] = useState<string | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isOnline, setIsOnline] = useState(true);
   const [loading, setLoading] = useState(false);
 
+  const ROLE_TO_USERNAME: { [key: string]: string } = {
+    'barra': 'usuario1',
+    'camarero_1': 'usuario2',
+    'camarero_2': 'usuario3',
+    'administrador': 'administrador'
+  };
+
   const setRole = async (newRole: string) => {
+    const newUsername = ROLE_TO_USERNAME[newRole] || newRole;
     setRoleState(newRole);
+    setUsernameState(newUsername);
     await offlineStorage.saveRole(newRole);
   };
 
