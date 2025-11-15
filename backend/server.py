@@ -100,8 +100,9 @@ class PartialPayment(BaseModel):
 class Order(BaseModel):
     id: Optional[str] = Field(alias="_id", default=None)
     table_number: int
-    zone: Optional[str] = "terraza_exterior"  # terraza_exterior, salon_interior, terraza_interior
+    zone: Optional[str] = "terraza_exterior"  # terraza_exterior, salon_interior, terraza_interior, barra
     waiter_role: str  # barra, camarero_1, camarero_2, administrador
+    created_by: Optional[str] = None  # usuario1, usuario2, usuario3, administrador
     products: List[OrderProduct]
     total: float
     paid_amount: Optional[float] = 0.0
