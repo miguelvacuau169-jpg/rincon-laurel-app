@@ -34,6 +34,7 @@ interface Order {
   table_number: number;
   zone: string;
   waiter_role: string;
+  created_by?: string;
   products: OrderProduct[];
   total: number;
   paid_amount: number;
