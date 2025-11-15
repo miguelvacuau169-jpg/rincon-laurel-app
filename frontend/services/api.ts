@@ -17,11 +17,12 @@ export const initSocket = (role: string, callbacks: any) => {
     socket.disconnect();
   }
 
-  socket = io(BACKEND_URL, {
+  socket = io(SOCKET_URL, {
     transports: ['polling', 'websocket'],
     reconnection: true,
     reconnectionDelay: 1000,
     reconnectionAttempts: 10,
+    path: '/socket.io/',
   });
 
   socket.on('connect', () => {
