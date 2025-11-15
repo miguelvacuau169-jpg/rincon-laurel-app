@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { api, initSocket, disconnectSocket, offlineStorage } from '../services/api';
 import * as Haptics from 'expo-haptics';
 import { Alert } from 'react-native';
+import { initializeOneSignal, addNotificationListener, sendNotification } from '../services/oneSignalService';
 
 interface Product {
   _id: string;
