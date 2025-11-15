@@ -4,9 +4,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const BACKEND_URL = Constants.expoConfig?.extra?.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:8001';
 const API_URL = `${BACKEND_URL}/api`;
+const SOCKET_URL = BACKEND_URL; // Socket.IO en mismo servidor
 
 console.log('Backend URL:', BACKEND_URL);
 console.log('API URL:', API_URL);
+console.log('Socket URL:', SOCKET_URL);
 
 let socket: Socket | null = null;
 
