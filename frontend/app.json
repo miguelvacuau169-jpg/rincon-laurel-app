@@ -40,7 +40,8 @@
           "resizeMode": "contain",
           "backgroundColor": "#6B5149"
         }
-      ]
+      ],
+      "onesignal-expo-plugin"
     ],
     "extra": {
       "EXPO_PUBLIC_BACKEND_URL": "https://resto-manager-100.preview.emergentagent.com"
