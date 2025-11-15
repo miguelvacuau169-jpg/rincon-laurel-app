@@ -336,6 +336,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     <AppContext.Provider
       value={{
         role,
+        username,
         setRole,
         orders,
         products,
