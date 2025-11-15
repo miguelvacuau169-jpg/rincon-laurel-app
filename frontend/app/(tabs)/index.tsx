@@ -792,6 +792,17 @@ const styles = StyleSheet.create({
     color: Colors.accent,
     fontWeight: '500',
   },
+  userBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 4,
+  },
+  userText: {
+    fontSize: 11,
+    color: Colors.olive,
+    fontWeight: '500',
+  },
   totalText: {
     fontSize: 18,
     fontWeight: 'bold',
