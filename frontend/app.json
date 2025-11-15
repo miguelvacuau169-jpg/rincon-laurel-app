@@ -41,7 +41,13 @@
           "backgroundColor": "#6B5149"
         }
       ],
-      "onesignal-expo-plugin"
+      [
+        "onesignal-expo-plugin",
+        {
+          "mode": "development",
+          "devTeam": "RINCON_LAUREL"
+        }
+      ]
     ],
     "extra": {
       "EXPO_PUBLIC_BACKEND_URL": "https://resto-manager-100.preview.emergentagent.com"
