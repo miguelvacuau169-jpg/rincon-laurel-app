@@ -106,7 +106,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const loadRole = async () => {
       const savedRole = await offlineStorage.getRole();
       if (savedRole) {
+        const savedUsername = ROLE_TO_USERNAME[savedRole] || savedRole;
         setRoleState(savedRole);
+        setUsernameState(savedUsername);
       }
     };
     loadRole();
