@@ -47,8 +47,26 @@
           "mode": "development",
           "devTeam": "RINCON_LAUREL"
         }
+      ],
+      [
+        "@react-native-firebase/app",
+        {
+          "android": {
+            "googleServicesFile": "./google-services.json"
+          }
+        }
       ]
     ],
+    "android": {
+      "package": "com.emergentagent.rinconlaurel",
+      "versionCode": 1,
+      "googleServicesFile": "./google-services.json",
+      "permissions": [
+        "INTERNET",
+        "VIBRATE",
+        "RECEIVE_BOOT_COMPLETED"
+      ]
+    },
     "extra": {
       "EXPO_PUBLIC_BACKEND_URL": "https://resto-manager-100.preview.emergentagent.com"
     },
