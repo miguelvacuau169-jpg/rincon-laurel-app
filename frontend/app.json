@@ -8,6 +8,11 @@
     "scheme": "rincon-laurel",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "extra": {
+      "eas": {
+        "projectId": "4c868176-eb57-4dbd-b6fa-88e3d8a1cb89"
+      }
+    },
     "splash": {
       "image": "./assets/images/logo.png",
       "resizeMode": "contain",
