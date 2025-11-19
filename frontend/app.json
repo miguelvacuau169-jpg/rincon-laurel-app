@@ -47,20 +47,11 @@
           "mode": "development",
           "devTeam": "RINCON_LAUREL"
         }
-      ],
-      [
-        "@react-native-firebase/app",
-        {
-          "android": {
-            "googleServicesFile": "./google-services.json"
-          }
-        }
       ]
     ],
     "android": {
       "package": "com.emergentagent.rinconlaurel",
       "versionCode": 1,
-      "googleServicesFile": "./google-services.json",
       "permissions": [
         "INTERNET",
         "VIBRATE",
