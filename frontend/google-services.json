@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "102234087366",
+    "project_id": "comandas-rincon",
+    "storage_bucket": "comandas-rincon.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:102234087366:android:PLACEHOLDER",
+        "android_client_info": {
+          "package_name": "com.emergentagent.rinconlaurel"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDPLACEHOLDER_KEY_ANDROID"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
