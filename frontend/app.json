@@ -8,11 +8,6 @@
     "scheme": "rincon-laurel",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-    "extra": {
-      "eas": {
-        "projectId": "4c868176-eb57-4dbd-b6fa-88e3d8a1cb89"
-      }
-    },
     "splash": {
       "image": "./assets/images/logo.png",
       "resizeMode": "contain",
@@ -21,14 +16,6 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.rinconlaurel.app"
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/logo.png",
-        "backgroundColor": "#6B5149"
-      },
-      "edgeToEdgeEnabled": true,
-      "package": "com.rinconlaurel.app"
     },
     "web": {
       "bundler": "metro",
@@ -55,6 +42,11 @@
       ]
     ],
     "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/logo.png",
+        "backgroundColor": "#6B5149"
+      },
+      "edgeToEdgeEnabled": true,
       "package": "com.emergentagent.rinconlaurel",
       "versionCode": 1,
       "permissions": [
@@ -64,6 +56,9 @@
       ]
     },
     "extra": {
+      "eas": {
+        "projectId": "4c868176-eb57-4dbd-b6fa-88e3d8a1cb89"
+      },
       "EXPO_PUBLIC_BACKEND_URL": "https://resto-manager-100.preview.emergentagent.com"
     },
     "experiments": {
