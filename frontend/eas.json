@@ -6,7 +6,8 @@
       },
       "env": {
         "EAS_BUILD_NODE_VERSION": "22.11.0",
-        "YARN_FLAGS": "--ignore-engines"
+        "YARN_FLAGS": "--ignore-engines",
+        "NPM_CONFIG_LEGACY_PEER_DEPS": "true"
       }
     },
     "production": {}
